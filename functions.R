@@ -6,6 +6,7 @@ loading <- function(whats_loading){
 }
 
 
+
 #function copied from internet that takes a shiny menu and deletes the unnecessary
 #div element that could confuse screen readers
 accessible_menu = function(bad_menu) {
@@ -47,3 +48,49 @@ rem_button_aria_label <- function(box) {
   box[["children"]][[1]][["children"]][[1]][["children"]][[2]][["children"]][[1]][["attribs"]][["title"]] = "open and close button" 
   return(box)
 }
+
+
+
+#lists all options for a given variable
+get_options <- function(variable, delimiter){
+  options <- variable |>
+    tidyr::replace_na("") |>
+    str_flatten(delimiter) |>
+    str_split(paste0("\\", delimiter))
+  
+  options <- options[[1]] |> 
+    unique() %>%
+    subset(. != "")
+  
+  return(c("[blank]", options))
+}
+
+
+
+
+#takes a list of strings and single string, and searches the string to see if any patterns on the list match it.
+search_string <- function(string, pattern_list){
+  
+  if(length(pattern_list) == 0) {
+    return(FALSE & is.na(string))
+  }
+  
+  return_when_empty <- "[blank]" %in% pattern_list
+  empty <- is.na(string)
+  
+  pattern_match <- pattern_list |>
+    str_replace_all("\\W", "\\\\W") |>
+    str_flatten(")|(") %>%
+    paste0("(", ., ")") %>%
+    str_detect(string = string, pattern = .)
+  
+  return(pattern_match | (empty & return_when_empty))
+  
+}
+
+
+
+
+
+
+

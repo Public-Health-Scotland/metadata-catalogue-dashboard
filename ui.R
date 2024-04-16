@@ -63,7 +63,21 @@ sidebar <- dashboardSidebar(
                icon = icon("code", verify_fa = FALSE) |> rem_aria_label()),
       
       br(),
-      uiOutput("download_table")
+      uiOutput("column_selector"),
+      uiOutput("filter_topic_selector"),
+      uiOutput("item_type_selector"),
+      uiOutput("tags_selector"),
+      uiOutput("duplicate_selector"),
+      uiOutput("equalities_selector"),
+      uiOutput("geographies_selector"),
+      uiOutput("hw_topic_selector"),
+      uiOutput("int_ext_selector"),
+      uiOutput("phs_pub_topic_selector"),
+      uiOutput("sex_selector"),
+      
+      uiOutput("download_table"),
+      
+      verbatimTextOutput("testing") #dev panel for testing things
       
       
     )    #sidebarMenu
@@ -352,7 +366,7 @@ body <-
 
 #ui ----
 #pulls together all the elements made in this script
-tagList( #needed for shinyjs
+ui <- tagList( #needed for shinyjs
   useShinyjs(),  # Include shinyjs
   tags$style("@import url(https://use.fontawesome.com/releases/v6.0/css/all.css);"),
   tags$head(HTML("<html lang='en'>"),
@@ -368,4 +382,13 @@ tagList( #needed for shinyjs
     body
   ) # dashboardPage
 )
+
+
+if(PRA) {
+  ui <- ui |> secure_app()
+}
+
+ui
+
+
 
