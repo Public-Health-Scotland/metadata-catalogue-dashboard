@@ -36,23 +36,24 @@ credentials <- data.frame(user = username, password = password, stringsAsFactors
 
 
 #Bring in the dataset ----
-dataset <- openxlsx::read.xlsx("../../data/20240318_masterfile.xlsx") |>
-  tibble()
-  
-names(dataset) <- names(dataset) |>
-  str_replace_all("\\.", " ") |>
-  str_to_sentence() |>
-  str_replace_all("[Pp][Hh][Ss]", "PHS")
-
-
-
-tag_options <- get_options(dataset$Tags, "|")
-hw_topic_options <- get_options(dataset$`Health & wellbeing topic`, "|")
-phs_pub_topic_options <- get_options(dataset$`PHS publication topic`, "|")
-equality_options <- get_options(dataset$Equality, "|")
-geographies_options <- get_options(dataset$Geographies, "|")
-sex_options <- c("[blank]", count(dataset, Sex)$Sex[-length(count(dataset, Sex)$Sex)])
-int_ext_options <- c("[blank]", "Internal", "External")
+load("www/dataset.Rdata")
+# dataset <- openxlsx::read.xlsx("../../data/20240318_masterfile.xlsx") |>
+#   tibble()
+#   
+# names(dataset) <- names(dataset) |>
+#   str_replace_all("\\.", " ") |>
+#   str_to_sentence() |>
+#   str_replace_all("[Pp][Hh][Ss]", "PHS")
+# 
+# 
+# 
+# tag_options <- get_options(dataset$Tags, "|")
+# hw_topic_options <- get_options(dataset$`Health & wellbeing topic`, "|")
+# phs_pub_topic_options <- get_options(dataset$`PHS publication topic`, "|")
+# equality_options <- get_options(dataset$Equality, "|")
+# geographies_options <- get_options(dataset$Geographies, "|")
+# sex_options <- c("[blank]", count(dataset, Sex)$Sex[-length(count(dataset, Sex)$Sex)])
+# int_ext_options <- c("[blank]", "Internal", "External")
 
 
 ##Testing extraction of link from Description column

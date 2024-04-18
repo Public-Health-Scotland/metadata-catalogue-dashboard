@@ -424,7 +424,7 @@ function(input, output, session){
     
     datatable(filtered_dataset(),
               options = list(scrollX = TRUE,
-                             scrollY = "55vh",
+                             scrollY = "50vh",
                              scrollCollapse = TRUE
                              )
               )
@@ -473,14 +473,17 @@ function(input, output, session){
   output$version_table <- renderTable({
     
     versions <- c("0.1", 
+                  "0.2",
                   "1.0 (planned)"
                   )
     
     dates <- c("18 March 2024",
+               "17 April 2024",
                "__ _____ 2024"
                )
     
     changes <- c("Basic skeleton of dashboard created",
+                 "Pre-release alpha build deployed",
                  "Final release"
                  )
     

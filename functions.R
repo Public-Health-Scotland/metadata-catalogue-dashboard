@@ -1,9 +1,9 @@
 
 #function adds a loading spinner with phs-teal colour
 #wrap any output in this function to make it show this while it loads
-loading <- function(whats_loading){
-  withSpinner(whats_loading, type = 5, color = "#1E7F84", size = 0.5)
-}
+# loading <- function(whats_loading){
+#   withSpinner(whats_loading, type = 5, color = "#1E7F84", size = 0.5)
+# }
 
 
 
@@ -52,18 +52,18 @@ rem_button_aria_label <- function(box) {
 
 
 #lists all options for a given variable
-get_options <- function(variable, delimiter){
-  options <- variable |>
-    tidyr::replace_na("") |>
-    str_flatten(delimiter) |>
-    str_split(paste0("\\", delimiter))
-  
-  options <- options[[1]] |> 
-    unique() %>%
-    subset(. != "")
-  
-  return(c("[blank]", options))
-}
+# get_options <- function(variable, delimiter){
+#   options <- variable |>
+#     tidyr::replace_na("") |>
+#     str_flatten(delimiter) |>
+#     str_split(paste0("\\", delimiter))
+#   
+#   options <- options[[1]] |> 
+#     unique() %>%
+#     subset(. != "")
+#   
+#   return(c("[blank]", options))
+# }
 
 
 

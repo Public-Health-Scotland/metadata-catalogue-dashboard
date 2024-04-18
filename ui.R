@@ -256,18 +256,18 @@ visualisation <- tabItem(
                
                p("This can be found at ",
                  tags$a(
-                   href = "https://embed.kumu.io/162f3d10e11928cb1ee955c7831057cb",##https://kumu.io/graham09/phs-dashboard-indicators #NR
-                   tags$u("https://embed.kumu.io/162f3d10e11928cb1ee955c7831057cb"),##https://kumu.io/graham09/phs-dashboard-indicators #NR
+                   href = "https://kumu.io/graham09/phs-dashboard-indicators",##https://kumu.io/graham09/phs-dashboard-indicators #NR
+                   tags$u("PHS Dashboard Indicators • Kumu"),##https://kumu.io/graham09/phs-dashboard-indicators #NR
                    class = "externallink", target = "_blank"),
                  ),
                
                tags$a(
-                 href = "https://embed.kumu.io/162f3d10e11928cb1ee955c7831057cb",##https://kumu.io/graham09/phs-dashboard-indicators #NR
+                 href = "https://kumu.io/graham09/phs-dashboard-indicators",##https://kumu.io/graham09/phs-dashboard-indicators #NR
                  class = "externallink",
                  target = "_blank",
                  tags$img(src = "kumu_screenshot.png",
                           alt = "Screenshot of the interactive visualisation",
-                          title = "https://embed.kumu.io/162f3d10e11928cb1ee955c7831057cb",##https://kumu.io/graham09/phs-dashboard-indicators #NR
+                          title = "PHS Dashboard Indicators • Kumu",##https://kumu.io/graham09/phs-dashboard-indicators #NR
                           width = "90%",
                           height = "90%")
                )
