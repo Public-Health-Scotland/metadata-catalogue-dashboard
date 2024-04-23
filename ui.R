@@ -65,6 +65,7 @@ sidebar <- dashboardSidebar(
       br(),
       uiOutput("column_selector"),
       uiOutput("filter_topic_selector"),
+      uiOutput("label_selector"),
       uiOutput("item_type_selector"),
       uiOutput("tags_selector"),
       uiOutput("duplicate_selector"),
@@ -142,7 +143,7 @@ home <- tabItem(
                             the table."),
                           
                           p("There is also a download button which looks like this:",
-                            img(src = "download_button.png", alt = "screenshot of the download button"), 
+                            img(src = "download_button_sidebar.png", alt = "screenshot of the download button"), 
                             ". This will allow the user to download the metadata 
                             table as an xlsx document. The data downloaded will have 
                             the filters applied to it from the sidebar in.")

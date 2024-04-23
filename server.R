@@ -16,6 +16,7 @@ function(input, output, session){
   #this "selected" section makes variables not reset when user navigates to another page
   selected <- reactiveValues(columns = names(dataset),
                              filter_topics = character(0),
+                             labels = "",
                              item_types = c("Indicator", "Dashboard", "Statistical report"),
                              tags = tag_options,
                              duplicate = TRUE,
@@ -32,6 +33,9 @@ function(input, output, session){
   
   observeEvent(input$selected_filter_topics, 
                selected$filter_topics <- input$selected_filter_topics)
+  
+  observeEvent(input$selected_labels, 
+               selected$labels <- input$selected_labels)
   
   observeEvent(input$selected_item_types, 
                selected$item_types <- input$selected_item_types)
@@ -89,8 +93,9 @@ function(input, output, session){
       pickerInput(
         inputId = "selected_filter_topics",
         label = "Which categories to use for filtering:",
-        choices = c("Type", "Tags", "Duplicate", "Equality", "Geographies","Health & wellbeing topic", 
-                    "Internal/external", "PHS publication topic", "Sex"), 
+        choices = c("Label", "Type", "Tags", "Duplicate", "Equality", "Geographies",
+                    "Health & wellbeing topic", "Internal/external", 
+                    "PHS publication topic", "Sex"), 
         selected = selected$filter_topics, 
         multiple = TRUE,
         options = list(`actions-box` = TRUE,
@@ -101,6 +106,38 @@ function(input, output, session){
         )
       )
     }
+  })
+  
+  ##Label ----
+  output$label_selector <- renderUI({
+    
+    if ("Label" %in% input$selected_filter_topics) {
+      selected <- selected$labels
+    } else {
+      selected <- ""
+    }
+    
+    labels <- textInput(
+      inputId = "selected_labels",
+      label = "Search Label column:",
+      value = selected,
+      placeholder = "Type a word or phrase to search for it"
+    )
+    
+    
+    if(("data_table" %in% input$sidebarMenu) & ("Label" %in% input$selected_filter_topics)) {
+      labels
+    } else if ("data_table" %in% input$sidebarMenu) {
+      labels |> hidden()
+    }
+  })
+  
+  nice_label <- reactive({
+    input$selected_labels |>
+      str_to_lower() |>
+      str_replace_all("\\W", "\\\\W") |>
+      paste0(".*")
+      
   })
   
   
@@ -400,7 +437,8 @@ function(input, output, session){
   #Output data table ----
   filtered_dataset <- reactive({
     dataset |>
-      filter(Type %in% input$selected_item_types,
+      filter(str_detect(str_to_lower(Label), nice_label()), 
+             Type %in% input$selected_item_types,
              search_string(string = Tags,  
                            pattern_list = input$selected_tags),
              ((!is.na(Duplicate) %in% input$selected_duplicate) | !("Duplicate" %in% input$selected_filter_topics)),
@@ -501,14 +539,14 @@ function(input, output, session){
   #Testing! ----
   #dev panel to display underlying values, uncomment to include
   
-  # output$testing <- renderPrint({
-  #   str_view(c(
-  #     paste0("A: ", input$selected_filter_topics),
-  #     paste0("B: ", selected$filter_topics),
-  #     paste0("C: "),
-  #     paste0("D: ")
-  #     ))
-  # })
+  output$testing <- renderPrint({
+    str_view(c(
+      paste0("A: ", input$selected_labels),
+      paste0("B: ", selected$labels),
+      paste0("C: ", nice_label()),
+      paste0("D: ")
+      ))
+  })
 
   
 }
