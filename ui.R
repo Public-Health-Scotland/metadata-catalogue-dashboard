@@ -23,7 +23,7 @@ header <- dashboardHeader(
   # ),
   
   tags$li(class = "dropdown",
-          tags$p("Health & Wellbeing Catalogue Dashboard v0.1")
+          tags$p("Health & Wellbeing Catalogue Dashboard v0.2")
   )
 )
 
@@ -62,7 +62,8 @@ sidebar <- dashboardSidebar(
                tabName = "version",
                icon = icon("code", verify_fa = FALSE) |> rem_aria_label()),
       
-      br(),
+
+      uiOutput("search_box"),
       uiOutput("column_selector"),
       uiOutput("filter_topic_selector"),
       uiOutput("label_selector"),
@@ -73,10 +74,11 @@ sidebar <- dashboardSidebar(
       uiOutput("geographies_selector"),
       uiOutput("hw_topic_selector"),
       uiOutput("int_ext_selector"),
-      uiOutput("phs_pub_topic_selector"),
       uiOutput("sex_selector"),
       
+      uiOutput("reset_button"),
       uiOutput("download_table"),
+      
       
       verbatimTextOutput("testing") #dev panel for testing things
       
@@ -170,8 +172,8 @@ home <- tabItem(
                           
                           p("The version of the dashboard available today is still in development 
                    and is subject to changes and refinements in the future. Contact ",
-                            tags$a(href = "mailto:kit.lawrence@phs.scot", 
-                                   tags$u("kit.lawrence@phs.scot")), 
+                            tags$a(href = "mailto:phs.metadatacatalogue@phs.scot", 
+                                   tags$u("phs.metadatacatalogue@phs.scot")), 
                             "for more information or to provide feedback.")
                           
                       ) 
@@ -225,7 +227,7 @@ definitions <- tabItem(
            
            tabPanel(title = "Definitions",
                     fluidRow(
-                      box(
+                      box(width = 10,
                         h1("Definitions"),
                         p("Each of the columns in the data table are defined here."), 
                         tableOutput("definitions_table"),

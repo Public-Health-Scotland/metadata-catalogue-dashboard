@@ -14,77 +14,101 @@ function(input, output, session){
   
   #Selected values ----
   #this "selected" section makes variables not reset when user navigates to another page
-  selected <- reactiveValues(columns = names(dataset),
+  selected <- reactiveValues(columns = c("Label", "Dashboard report name", "Health & wellbeing topic"),
                              filter_topics = character(0),
-                             labels = "",
+                             #labels = "",
                              item_types = c("Indicator", "Dashboard", "Statistical report"),
                              tags = tag_options,
-                             duplicate = TRUE,
                              equalities = equality_options,
                              geographies = geographies_options,
                              hw_topics = hw_topic_options,
                              int_ext = int_ext_options,
-                             phs_pub_topics = phs_pub_topic_options,
                              sex = sex_options)
   
   
-  observeEvent(input$selected_columns, 
+  observeEvent(input$selected_columns_open, 
                selected$columns <- input$selected_columns)
   
-  observeEvent(input$selected_filter_topics, 
+  observeEvent(input$selected_filter_topics_open, 
                selected$filter_topics <- input$selected_filter_topics)
   
-  observeEvent(input$selected_labels, 
-               selected$labels <- input$selected_labels)
+  # observeEvent(input$selected_labels, 
+  #              selected$labels <- input$selected_labels)
   
   observeEvent(input$selected_item_types, 
                selected$item_types <- input$selected_item_types)
   
-  observeEvent(input$selected_tags, 
+  observeEvent(input$selected_tags_open, 
                selected$tags <- input$selected_tags)
   
-  observeEvent(input$selected_duplicate,
-               selected$duplicate <- input$selected_duplicate)
-  
-  observeEvent(input$selected_geographies,
+  observeEvent(input$selected_geographies_open,
                selected$geographies <- input$selected_geographies)
   
-  observeEvent(input$selected_equalities,
+  observeEvent(input$selected_equalities_open,
                selected$equalities <- input$selected_equalities)
   
   observeEvent(input$selected_int_ext,
                selected$int_ext <- input$selected_int_ext)
   
-  observeEvent(input$selected_hw_topics,
+  observeEvent(input$selected_hw_topics_open,
                selected$hw_topics <- input$selected_hw_topics)
   
-  observeEvent(input$selected_phs_pub_topics,
-               selected$phs_pub_topics <- input$selected_phs_pub_topics)
-  
-  observeEvent(input$selected_sex, 
+  observeEvent(input$selected_sex_open, 
                selected$sex <- input$selected_sex)
   
   
   
   
   #Data table filters ----
+  
+  ##General search ----
+  output$search_box <- renderUI({
+    if("data_table" %in% input$sidebarMenu){
+      textInput(
+        inputId = "general_search",
+        label = "Search:",
+        value = "",
+        placeholder = "Search the entire catalogue"
+      )
+    }
+  }) 
+  
+  nice_search <- reactive({
+    input$general_search |>
+      str_to_lower() |>
+      str_replace_all("\\W", "\\\\W") |>
+      paste0(".*")
+  })
+  
+  
+  search_list <- reactive({
+    if(length(input$general_search) == 1) {
+      return(str_split_1(str_to_lower(input$general_search), " "))
+    } else {
+      return("")
+    }
+  })
+  
+  
   ##Columns ----
   output$column_selector <- renderUI({
     if("data_table" %in% input$sidebarMenu){
       pickerInput(
         inputId = "selected_columns",
         label = "Columns to display:",
-        choices = names(dataset), 
+        choices = names(dataset)[-length(names(dataset))], 
         selected = selected$columns, 
         multiple = TRUE,
-        options = list(`actions-box` = TRUE,
-                       size = 10),
+        options = pickerOptions(actionsBox = TRUE,
+                                selectedTextFormat = "count",
+                                size = 10),
         choicesOpt = list(
-          style = rep("color: #000000", length(names(dataset))) # PHS-purple text
+          style = rep("color: #000000", length(names(dataset))-1) # PHS-purple text
         )
       )
     }
   })
+  
   
   
   ##Filter topics ----
@@ -93,13 +117,13 @@ function(input, output, session){
       pickerInput(
         inputId = "selected_filter_topics",
         label = "Which categories to use for filtering:",
-        choices = c("Label", "Type", "Tags", "Duplicate", "Equality", "Geographies",
-                    "Health & wellbeing topic", "Internal/external", 
-                    "PHS publication topic", "Sex"), 
+        choices = c("Label", "Health & wellbeing topic", "Tags",
+                    "Type", "Produced by PHS", "Sex", "Equality", "Geographies"),
         selected = selected$filter_topics, 
         multiple = TRUE,
-        options = list(`actions-box` = TRUE,
-                       size = 10),
+        options = pickerOptions(actionsBox = TRUE,
+                                selectedTextFormat = "count",
+                                size = 10),
         choicesOpt = list(
           #content = tag_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
           style = rep("color: #000000", length(names(dataset)))
@@ -108,20 +132,23 @@ function(input, output, session){
     }
   })
   
+  
+  
+  
   ##Label ----
   output$label_selector <- renderUI({
     
-    if ("Label" %in% input$selected_filter_topics) {
-      selected <- selected$labels
-    } else {
-      selected <- ""
-    }
+    # if ("Label" %in% input$selected_filter_topics) {
+    #   selected <- "" #selected$labels
+    # } else {
+    #   selected <- ""
+    # }
     
     labels <- textInput(
       inputId = "selected_labels",
-      label = "Search Label column:",
-      value = selected,
-      placeholder = "Type a word or phrase to search for it"
+      label = "Label:",
+      value = "",
+      placeholder = "Search only the Label column"
     )
     
     
@@ -137,7 +164,14 @@ function(input, output, session){
       str_to_lower() |>
       str_replace_all("\\W", "\\\\W") |>
       paste0(".*")
-      
+  })
+  
+  label_search_list <- reactive({
+    if(length(input$general_search) == 1) {
+      return(str_split_1(str_to_lower(input$selected_labels), " "))
+    } else {
+      return("")
+    }
   })
   
   
@@ -194,8 +228,9 @@ function(input, output, session){
       choices = tag_options,
       selected = selected, 
       multiple = TRUE,
-      options = list(`actions-box` = TRUE,
-                     size = 10),
+      options = pickerOptions(actionsBox = TRUE,
+                              selectedTextFormat = "count",
+                              size = 10),
       choicesOpt = list(
         content = tag_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
         style = rep("color: #000000", length(tag_options))
@@ -209,21 +244,7 @@ function(input, output, session){
     }
   })
   
-  
-  
-  ##Duplicate ----
-  output$duplicate_selector <- renderUI({
-    if(("data_table" %in% input$sidebarMenu) & ("Duplicate" %in% input$selected_filter_topics)){
-      radioButtons(
-        inputId = "selected_duplicate",
-        label = "Duplicate:",
-        choices = c(TRUE, FALSE),
-        selected = selected$duplicate,
-        inline = TRUE
-      )
-    }
-  })
-  
+
   
   
   
@@ -241,8 +262,9 @@ function(input, output, session){
       choices = equality_options,
       selected = selected, 
       multiple = TRUE,
-      options = list(`actions-box` = TRUE,
-                     size = 10),
+      options = pickerOptions(actionsBox = TRUE,
+                              selectedTextFormat = "count",
+                              size = 10),
       choicesOpt = list(
         content = equality_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
         style = rep("color: #000000", length(equality_options))
@@ -273,8 +295,9 @@ function(input, output, session){
       choices = geographies_options,
       selected = selected, 
       multiple = TRUE,
-      options = list(`actions-box` = TRUE,
-                     size = 10),
+      options = pickerOptions(actionsBox = TRUE,
+                              selectedTextFormat = "count",
+                              size = 10),
       choicesOpt = list(
         content = geographies_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
         style = rep("color: #000000", length(geographies_options))
@@ -306,7 +329,8 @@ function(input, output, session){
       choices = hw_topic_options,
       selected = selected, 
       multiple = TRUE,
-      options = list(`actions-box` = TRUE,
+      options = pickerOptions(actionsBox = TRUE,
+                     selectedTextFormat = "count",
                      size = 10),
       choicesOpt = list(
         content = hw_topic_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
@@ -324,10 +348,10 @@ function(input, output, session){
   
   
   
-  ##Internal/external ----
+  ##Produced by PHS ----
   output$int_ext_selector <- renderUI({
     
-    if ("Internal/external" %in% input$selected_filter_topics) {
+    if ("Produced by PHS" %in% input$selected_filter_topics) {
       selected <- selected$int_ext
     } else {
       selected <- int_ext_options
@@ -348,13 +372,13 @@ function(input, output, session){
     
     int_ext <- checkboxGroupInput(
       inputId = "selected_int_ext",
-      label = "Internal/external:",
+      label = "Produced by PHS:",
       choices = int_ext_options,
       selected = selected
     )
     
     
-    if(("data_table" %in% input$sidebarMenu) & ("Internal/external" %in% input$selected_filter_topics)) {
+    if(("data_table" %in% input$sidebarMenu) & ("Produced by PHS" %in% input$selected_filter_topics)) {
       int_ext
     } else if ("data_table" %in% input$sidebarMenu) {
       int_ext |> hidden()
@@ -362,38 +386,6 @@ function(input, output, session){
   })
   
   
-  
-  
-  
-  ##PHS publication topic ----
-  output$phs_pub_topic_selector <- renderUI({
-    
-    if ("PHS publication topic" %in% input$selected_filter_topics) {
-      selected <- selected$phs_pub_topics
-    } else {
-      selected <- phs_pub_topic_options
-    }
-    
-    phs_pub_topics <- pickerInput(
-      inputId = "selected_phs_pub_topics",
-      label = "PHS publication topics:",
-      choices = phs_pub_topic_options,
-      selected = selected, 
-      multiple = TRUE,
-      options = list(`actions-box` = TRUE,
-                     size = 10),
-      choicesOpt = list(
-        content = phs_pub_topic_options |> str_wrap(width = 20) |> str_replace_all("\\n", "<br>"),
-        style = rep("color: #000000", length(phs_pub_topic_options))
-      )
-    )
-    
-    if(("data_table" %in% input$sidebarMenu) & ("PHS publication topic" %in% input$selected_filter_topics)){
-      phs_pub_topics
-    } else if ("data_table" %in% input$sidebarMenu) {
-      phs_pub_topics |> hidden()
-    }
-  })
   
   
   
@@ -413,8 +405,9 @@ function(input, output, session){
       choices = sex_options, 
       selected = selected, 
       multiple = TRUE,
-      options = list(`actions-box` = TRUE,
-                     size = 10),
+      options = pickerOptions(actionsBox = TRUE,
+                              selectedTextFormat = "count",
+                              size = 10),
       choicesOpt = list(
         style = rep("color: #000000", length(sex_options)) # PHS-purple text
       )
@@ -430,6 +423,20 @@ function(input, output, session){
   
   
   
+  ##Reset button ----
+  output$reset_button <- renderUI({
+    if("data_table" %in% input$sidebarMenu) {
+      actionBttn(inputId = "reset",
+                 label = "Reset filters",
+                 color = "danger")
+    }
+  })
+  
+  observeEvent(input$reset, {
+    selected$columns <- c("Label", "Dashboard report name", "Health & wellbeing topic")
+    selected$filter_topics <- character(0)
+    }
+    )
   
   
   
@@ -437,20 +444,19 @@ function(input, output, session){
   #Output data table ----
   filtered_dataset <- reactive({
     dataset |>
-      filter(str_detect(str_to_lower(Label), nice_label()), 
+      filter(search_string_and(string = Chr_merge, pattern_list = search_list()),
+             
+             search_string_and(string = str_to_lower(Label), pattern_list = label_search_list()),
+             
              Type %in% input$selected_item_types,
-             search_string(string = Tags,  
-                           pattern_list = input$selected_tags),
-             ((!is.na(Duplicate) %in% input$selected_duplicate) | !("Duplicate" %in% input$selected_filter_topics)),
-             search_string(string = Equality,
-                           pattern_list = input$selected_equalities),
-             search_string(string = Geographies,
-                           pattern_list = input$selected_geographies),
-             search_string(string = `Health & wellbeing topic`,
-                           pattern_list = input$selected_hw_topics),
-             ((`Internal/external` %in% input$selected_int_ext) | (is.na(`Internal/external`) & "[blank]" %in% input$selected_int_ext)),
-             search_string(string = `PHS publication topic`,
-                           pattern_list = input$selected_phs_pub_topics),
+             
+             search_string_or(string = Tags, pattern_list = input$selected_tags),
+             search_string_or(string = Equality, pattern_list = input$selected_equalities),
+             search_string_or(string = Geographies, pattern_list = input$selected_geographies),
+             search_string_or(string = `Health & wellbeing topic`, pattern_list = input$selected_hw_topics),
+             
+             ((`Produced by PHS` %in% input$selected_int_ext) | (is.na(`Produced by PHS`) & "[blank]" %in% input$selected_int_ext)),
+             
              ((Sex %in% input$selected_sex) | (is.na(Sex) & "[blank]" %in% input$selected_sex))
              ) |>
       select(all_of(input$selected_columns))
@@ -463,7 +469,8 @@ function(input, output, session){
     datatable(filtered_dataset(),
               options = list(scrollX = TRUE,
                              scrollY = "50vh",
-                             scrollCollapse = TRUE
+                             scrollCollapse = TRUE,
+                             searching = FALSE
                              )
               )
     
@@ -501,9 +508,9 @@ function(input, output, session){
   output$definitions_table <- renderTable({
     
     definitions |>
-      select(`Column name`, `Data type`, Definition)
+      select(`Column name`, `Data type`, Definition, `Possible values`)
     
-  }, striped = TRUE, bordered = TRUE, na = "")
+  }, striped = TRUE, bordered = TRUE, na = "", width = "100%")
   
   
   
@@ -539,14 +546,17 @@ function(input, output, session){
   #Testing! ----
   #dev panel to display underlying values, uncomment to include
   
-  output$testing <- renderPrint({
-    str_view(c(
-      paste0("A: ", input$selected_labels),
-      paste0("B: ", selected$labels),
-      paste0("C: ", nice_label()),
-      paste0("D: ")
-      ))
-  })
+  # output$testing <- renderPrint({
+  #   str_view(c(
+  #     paste0("A: ", input$reset),
+  #     paste0("B: ", input$selected_columns_open),
+  #     paste0("C: ", search_list()),
+  #     paste0("D: ", search_list() |>
+  #              str_replace_all("\\W", "\\\\W") |>
+  #              str_flatten(")(?=.*") %>%
+  #              paste0("(?=.*", ., ").*"))
+  #     ))
+  # })
 
   
 }

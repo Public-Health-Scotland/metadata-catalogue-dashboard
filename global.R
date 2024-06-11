@@ -37,32 +37,10 @@ credentials <- data.frame(user = username, password = password, stringsAsFactors
 
 #Bring in the dataset ----
 load("www/dataset.Rdata")
-# dataset <- openxlsx::read.xlsx("../../data/20240318_masterfile.xlsx") |>
-#   tibble()
-#   
-# names(dataset) <- names(dataset) |>
-#   str_replace_all("\\.", " ") |>
-#   str_to_sentence() |>
-#   str_replace_all("[Pp][Hh][Ss]", "PHS")
-# 
-# 
-# 
-# tag_options <- get_options(dataset$Tags, "|")
-# hw_topic_options <- get_options(dataset$`Health & wellbeing topic`, "|")
-# phs_pub_topic_options <- get_options(dataset$`PHS publication topic`, "|")
-# equality_options <- get_options(dataset$Equality, "|")
-# geographies_options <- get_options(dataset$Geographies, "|")
-# sex_options <- c("[blank]", count(dataset, Sex)$Sex[-length(count(dataset, Sex)$Sex)])
-# int_ext_options <- c("[blank]", "Internal", "External")
 
 
-##Testing extraction of link from Description column
-# dataset |>
-#   mutate(desc_link = str_extract(Description, "(^\\S*/+\\S*\\s)|(^\\S*$)"),
-#          desc_sin_link = str_remove_all(Description, "(^\\S*/+\\S*\\s)|(^\\S*$)")) |>
-#   select(Description, desc_link, desc_sin_link, `Link(s)`) |>
-#   mutate(match = desc_link == `Link(s)`) |>
-#   View()
+# dataset <- dataset |>
+#   bind_cols(tidyr::unite(dataset, chr_merge, everything(), na.rm = TRUE, sep = " ") |> mutate(chr_merge = str_to_lower(chr_merge)))
 
 
 

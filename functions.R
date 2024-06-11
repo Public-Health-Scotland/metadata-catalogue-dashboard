@@ -68,12 +68,13 @@ rem_button_aria_label <- function(box) {
 
 
 
-#takes a list of strings and single string, and searches the string to see if any patterns on the list match it.
-search_string <- function(string, pattern_list){
+#takes a list of strings and single string, and searches the string to see if ANY patterns on the list match it.
+search_string_or <- function(string, pattern_list){
   
   if(length(pattern_list) == 0) {
-    return(FALSE & is.na(string))
+    return(FALSE)
   }
+  
   
   return_when_empty <- "[blank]" %in% pattern_list
   empty <- is.na(string)
@@ -89,7 +90,25 @@ search_string <- function(string, pattern_list){
 }
 
 
-
+#takes a list of strings and single string, and searches the string to see if ALL patterns on the list match it.
+search_string_and <- function(string, pattern_list){
+  
+  if(length(pattern_list) == 0) {
+    return(FALSE)
+  }
+  
+  return_when_empty <- "[blank]" %in% pattern_list
+  empty <- is.na(string)
+  
+  pattern_match <- pattern_list |>
+    str_replace_all("\\W", "\\\\W") |>
+    str_flatten(")(?=.*") %>%
+    paste0("(?=.*", ., ").*") %>%
+    str_detect(string = string, pattern = .)
+  
+  return(pattern_match | (empty & return_when_empty))
+  
+}
 
 
 
