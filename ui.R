@@ -46,8 +46,8 @@ sidebar <- dashboardSidebar(
                icon = icon("house", verify_fa = FALSE) |> rem_aria_label(),
                selected = TRUE),
       
-      menuItem("Data Table",
-               tabName = "data_table",
+      menuItem("Catalogue",
+               tabName = "catalogue",
                icon = icon("table", verify_fa = FALSE) |> rem_aria_label()),
       
       menuItem("Definitions",
@@ -75,6 +75,7 @@ sidebar <- dashboardSidebar(
       uiOutput("hw_topic_selector"),
       uiOutput("int_ext_selector"),
       uiOutput("sex_selector"),
+      uiOutput("source_selector"),
       
       uiOutput("reset_button"),
       uiOutput("download_table"),
@@ -108,70 +109,98 @@ home <- tabItem(
                       
                       box(width = 12,
                           solidHeader = TRUE,
-                          h1("Welcome to the Health & Wellbeing Catalogue Dashboard"),
+                          h1("Welcome to the Health & Wellbeing Catalogue Dashboard")
                       ), #box
                       
                       
-                      # p("Click +/- to open and close the sections below", 
-                      #   style = "text-align: right;"),
+                      p("Click +/- to open and close the sections below",
+                        style = "text-align: right;"),
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
                       box(width = 12,
-                          #collapsible = TRUE, collapsed = TRUE,
+                          collapsible = TRUE, collapsed = TRUE,
                           title = p(strong("What is this dashboard?")),
-                          p("This dashboard aims to collect information on all dashboards 
-                   and regular publications by PHS in one place, as well as which
-                   indicators are shown in which dashboards/publications. On top of 
-                   which indicators are associated with which dashboards/publications,
-                   each dashboard, publication and indicator has a metadata profile
-                   that gives more detail on that item."),
                           
-                          p("The left-hand menu can also be hidden and revealed by 
-                            clicking on this toggle button",
+                          p("This metadata catalogue provides a single source from which to search for 
+                            all publicly available health and wellbeing indicators for Scotland. It has
+                            been developed to make it easier to find and use existing intelligence for 
+                            learning and decision making related to health and wellbeing."),
+                          
+                          p("The catalogue includes data from Public Health Scotland, as well as from 
+                            other data owners such as the Office for National Statistics, National Records
+                            of Scotland, and Scottish Government."),
+                          
+                          p("Indicators from each publication are grouped by category, providing an 
+                            overview of available metrics by topic area. Each indicator has a metadata 
+                            profile that provides available detail on that item, for example, frequency
+                            of data updates, categorical breakdowns, and data source."),
+                          
+                          p("The dashboard allows quick identification of relevant metrics across wide 
+                            range of topic areas and sources rather than searching multiple places.")
+                      ),
+                      
+                      
+                      #boxes with collapsible=TRUE below make the sections on the homepage collapsible
+                      box(width = 12,
+                          collapsible = TRUE, collapsed = TRUE,
+                          title = p(strong("Using the Data Catalogue")),
+                          
+                          p("The Catalogue tab displays a table, with each row being a dashboard, 
+                            publication or indicator, and each column a category of metadata for the
+                            row item. The default setting displays three columns (label, dashboard report 
+                            name and health & wellbeing topic) but more metadata columns can be added by
+                            selecting additional items from the ‘Columns to display’ drop downs."),
+                          
+                          p("Controls in the sidebar allow you to filter and search the catalogue, for 
+                            example by geography, equalities, or data source."),
+                          
+                          p("There is a download button which looks like this:",
+                            img(src = "download_button_sidebar.png", alt = "screenshot of the download button"), 
+                            ". This will allow the user to download the metadata table as an Excel document.
+                            The metadata downloaded will have the chosen filters applied."),
+                          
+                          p("The left-hand menu can be hidden and revealed by clicking on this toggle button ",
                             img(src = "sidebar_toggle.png", alt = "screenshot of the sidebar toggle button"),
-                            "at the top of the screen. This can be useful if you are viewing charts on a small computer screen.")
+                            " at the top of the screen.")
+                          
+                      ), 
+                      
+                      
+                      
+                      #boxes with collapsible=TRUE below make the sections on the homepage collapsible
+                      box(width = 12,
+                          collapsible = TRUE, collapsed = TRUE,
+                          title = p(strong("Definitions")),
+                          
+                          p("The Definitions tab provides a more detailed description of what is contained 
+                            within each item. Where possible, this tab also provides a list of possible 
+                            values the user can select from.")
+                          
                       ), 
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
                       box(width = 12,
-                          #collapsible = TRUE, collapsed = TRUE,
-                          title = p(strong("Data Table")),
-                          p("The Data Table tab on this dashboard displays a table 
-                            with each row being a dashboard, publication or indicator,
-                            and each column being a catagory of metadata for these. 
-                            Controls in the sidebar allow for filtering and searching
-                            the table."),
-                          
-                          p("There is also a download button which looks like this:",
-                            img(src = "download_button_sidebar.png", alt = "screenshot of the download button"), 
-                            ". This will allow the user to download the metadata 
-                            table as an xlsx document. The data downloaded will have 
-                            the filters applied to it from the sidebar in.")
-                      ), #function to remove unnecessary aria label on collapsible box
-                      
-                      
-                      #boxes with collapsible=TRUE below make the sections on the homepage collapsible
-                      box(width = 12,
-                          #collapsible = TRUE, collapsed = TRUE,
+                          collapsible = TRUE, collapsed = TRUE,
                           title = p(strong("Visualisation")),
                           
-                          p("The data available on this dashboard is also viewable 
-                            in an interactive visualisation with many useful filtering 
-                            and searching features. This visualisation was built 
-                            using Kumu rather than R Shiny, and so the 'visualisation'
-                            tab in this dashboard provides a link to the Kumu page.")
+                          p("The metadata available on this dashboard can be viewed in an interactive 
+                            visualisation with several filtering and searching features. The Visualisation 
+                            tab provides a link to an alternative way of interacting with the catalogue. 
+                            This option is particularly useful for visualising connections between dashboards
+                            and information gaps by topic area.")
+                          
                       ), 
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
                       box(width = 12,
-                          #collapsible = TRUE, collapsed = FALSE,
+                          collapsible = TRUE, collapsed = FALSE,
                           title = p(strong("Tell us what you think")),
                           
-                          p("The version of the dashboard available today is still in development 
-                   and is subject to changes and refinements in the future. Contact ",
+                          p("The dashboard is still in development and is subject to changes and refinements 
+                            in the future. Contact ",
                             tags$a(href = "mailto:phs.metadatacatalogue@phs.scot", 
                                    tags$u("phs.metadatacatalogue@phs.scot")), 
                             "for more information or to provide feedback.")
@@ -194,16 +223,16 @@ home <- tabItem(
 
 
 
-#Data Table ----
-data_table <- tabItem(
-  tabName = "data_table",
+#Catalogue ----
+catalogue <- tabItem(
+  tabName = "catalogue",
   fluidRow(
-    tabBox(title = "Data Table",
+    tabBox(title = "Catalogue",
            # The id lets us use input$home_tab on the server to find the current tab
-           id = "data_table_tab",
+           id = "catalogue_tab",
            width = 12,
            
-           tabPanel(title = "Data Table",
+           tabPanel(title = "Catalogue",
              fluidRow(
                DTOutput("main_table")
              )
@@ -353,7 +382,7 @@ body <-
     
     #add dashboard pages to this list if we make more
     tabItems(home,
-             data_table,
+             catalogue,
              definitions,
              visualisation,
              version,
@@ -383,7 +412,9 @@ ui <- tagList( #needed for shinyjs
     header,
     sidebar,
     body
-  ) # dashboardPage
+  ), # dashboardPage
+  
+  shiny::includeScript("script.js")
 )
 
 

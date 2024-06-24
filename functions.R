@@ -51,19 +51,6 @@ rem_button_aria_label <- function(box) {
 
 
 
-#lists all options for a given variable
-# get_options <- function(variable, delimiter){
-#   options <- variable |>
-#     tidyr::replace_na("") |>
-#     str_flatten(delimiter) |>
-#     str_split(paste0("\\", delimiter))
-#   
-#   options <- options[[1]] |> 
-#     unique() %>%
-#     subset(. != "")
-#   
-#   return(c("[blank]", options))
-# }
 
 
 
@@ -97,7 +84,7 @@ search_string_and <- function(string, pattern_list){
     return(FALSE)
   }
   
-  return_when_empty <- "[blank]" %in% pattern_list
+  return_when_empty <- pattern_list == ""
   empty <- is.na(string)
   
   pattern_match <- pattern_list |>
@@ -109,6 +96,12 @@ search_string_and <- function(string, pattern_list){
   return(pattern_match | (empty & return_when_empty))
   
 }
+
+
+
+
+
+
 
 
 

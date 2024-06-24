@@ -16,7 +16,6 @@ function(input, output, session){
   #this "selected" section makes variables not reset when user navigates to another page
   selected <- reactiveValues(columns = c("Label", "Dashboard report name", "Health & wellbeing topic"),
                              filter_topics = character(0),
-                             #labels = "",
                              item_types = c("Indicator", "Dashboard", "Statistical report"),
                              tags = tag_options,
                              equalities = equality_options,
@@ -31,9 +30,6 @@ function(input, output, session){
   
   observeEvent(input$selected_filter_topics_open, 
                selected$filter_topics <- input$selected_filter_topics)
-  
-  # observeEvent(input$selected_labels, 
-  #              selected$labels <- input$selected_labels)
   
   observeEvent(input$selected_item_types, 
                selected$item_types <- input$selected_item_types)
@@ -63,7 +59,7 @@ function(input, output, session){
   
   ##General search ----
   output$search_box <- renderUI({
-    if("data_table" %in% input$sidebarMenu){
+    if("catalogue" %in% input$sidebarMenu){
       textInput(
         inputId = "general_search",
         label = "Search:",
@@ -72,14 +68,6 @@ function(input, output, session){
       )
     }
   }) 
-  
-  nice_search <- reactive({
-    input$general_search |>
-      str_to_lower() |>
-      str_replace_all("\\W", "\\\\W") |>
-      paste0(".*")
-  })
-  
   
   search_list <- reactive({
     if(length(input$general_search) == 1) {
@@ -92,11 +80,11 @@ function(input, output, session){
   
   ##Columns ----
   output$column_selector <- renderUI({
-    if("data_table" %in% input$sidebarMenu){
+    if("catalogue" %in% input$sidebarMenu){
       pickerInput(
         inputId = "selected_columns",
         label = "Columns to display:",
-        choices = names(dataset)[-length(names(dataset))], 
+        choices = names(dataset)[-((length(names(dataset))-1):length(names(dataset)))], 
         selected = selected$columns, 
         multiple = TRUE,
         options = pickerOptions(actionsBox = TRUE,
@@ -113,12 +101,12 @@ function(input, output, session){
   
   ##Filter topics ----
   output$filter_topic_selector <- renderUI({
-    if("data_table" %in% input$sidebarMenu){
+    if("catalogue" %in% input$sidebarMenu){
       pickerInput(
         inputId = "selected_filter_topics",
         label = "Which categories to use for filtering:",
         choices = c("Label", "Health & wellbeing topic", "Tags",
-                    "Type", "Produced by PHS", "Sex", "Equality", "Geographies"),
+                    "Type", "Produced by PHS", "Data source(s)", "Sex", "Equality", "Geographies"),
         selected = selected$filter_topics, 
         multiple = TRUE,
         options = pickerOptions(actionsBox = TRUE,
@@ -138,12 +126,6 @@ function(input, output, session){
   ##Label ----
   output$label_selector <- renderUI({
     
-    # if ("Label" %in% input$selected_filter_topics) {
-    #   selected <- "" #selected$labels
-    # } else {
-    #   selected <- ""
-    # }
-    
     labels <- textInput(
       inputId = "selected_labels",
       label = "Label:",
@@ -152,22 +134,15 @@ function(input, output, session){
     )
     
     
-    if(("data_table" %in% input$sidebarMenu) & ("Label" %in% input$selected_filter_topics)) {
+    if(("catalogue" %in% input$sidebarMenu) & ("Label" %in% input$selected_filter_topics)) {
       labels
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       labels |> hidden()
     }
   })
   
-  nice_label <- reactive({
-    input$selected_labels |>
-      str_to_lower() |>
-      str_replace_all("\\W", "\\\\W") |>
-      paste0(".*")
-  })
-  
   label_search_list <- reactive({
-    if(length(input$general_search) == 1) {
+    if(length(input$selected_labels) == 1) {
       return(str_split_1(str_to_lower(input$selected_labels), " "))
     } else {
       return("")
@@ -184,19 +159,6 @@ function(input, output, session){
       selected <- c("Indicator", "Dashboard", "Statistical report")
     }
     
-    # item_types <- pickerInput(
-    #   inputId = "selected_item_types",
-    #   label = "Types of item to display:",
-    #   choices = c("Indicator", "Dashboard", "Statistical report"), 
-    #   selected = selected, 
-    #   multiple = TRUE,
-    #   options = list(`actions-box` = TRUE,
-    #                  size = 10),
-    #   choicesOpt = list(
-    #     style = rep("color: #000000", 3) # PHS-purple text
-    #   )
-    # )
-    
     item_types <- checkboxGroupInput(
       inputId = "selected_item_types",
       label = "Types of item to display:",
@@ -205,9 +167,9 @@ function(input, output, session){
     )
     
     
-    if(("data_table" %in% input$sidebarMenu) & ("Type" %in% input$selected_filter_topics)) {
+    if(("catalogue" %in% input$sidebarMenu) & ("Type" %in% input$selected_filter_topics)) {
       item_types
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       item_types |> hidden()
     }
   })
@@ -237,9 +199,9 @@ function(input, output, session){
       )
     )
     
-    if(("data_table" %in% input$sidebarMenu) & ("Tags" %in% input$selected_filter_topics)){
+    if(("catalogue" %in% input$sidebarMenu) & ("Tags" %in% input$selected_filter_topics)){
       tags
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       tags |> hidden()
     }
   })
@@ -271,9 +233,9 @@ function(input, output, session){
       )
     )
     
-    if(("data_table" %in% input$sidebarMenu) & ("Equality" %in% input$selected_filter_topics)){
+    if(("catalogue" %in% input$sidebarMenu) & ("Equality" %in% input$selected_filter_topics)){
       equalities
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       equalities |> hidden()
     }
   })
@@ -304,9 +266,9 @@ function(input, output, session){
       )
     )
     
-    if(("data_table" %in% input$sidebarMenu) & ("Geographies" %in% input$selected_filter_topics)){
+    if(("catalogue" %in% input$sidebarMenu) & ("Geographies" %in% input$selected_filter_topics)){
       geographies
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       geographies |> hidden()
     }
   })
@@ -338,9 +300,9 @@ function(input, output, session){
       )
     )
     
-    if(("data_table" %in% input$sidebarMenu) & ("Health & wellbeing topic" %in% input$selected_filter_topics)){
+    if(("catalogue" %in% input$sidebarMenu) & ("Health & wellbeing topic" %in% input$selected_filter_topics)){
       hw_topics
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       hw_topics |> hidden()
     }
   })
@@ -356,20 +318,7 @@ function(input, output, session){
     } else {
       selected <- int_ext_options
     }
-    
-    # int_ext <- pickerInput(
-    #   inputId = "selected_int_ext",
-    #   label = "Internal/external:",
-    #   choices = int_ext_options, 
-    #   selected = selected, 
-    #   multiple = TRUE,
-    #   options = list(`actions-box` = TRUE,
-    #                  size = 10),
-    #   choicesOpt = list(
-    #     style = rep("color: #000000", length(int_ext_options)) # PHS-purple text
-    #   )
-    # )
-    
+
     int_ext <- checkboxGroupInput(
       inputId = "selected_int_ext",
       label = "Produced by PHS:",
@@ -378,9 +327,9 @@ function(input, output, session){
     )
     
     
-    if(("data_table" %in% input$sidebarMenu) & ("Produced by PHS" %in% input$selected_filter_topics)) {
+    if(("catalogue" %in% input$sidebarMenu) & ("Produced by PHS" %in% input$selected_filter_topics)) {
       int_ext
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       int_ext |> hidden()
     }
   })
@@ -414,18 +363,45 @@ function(input, output, session){
     )
     
     
-    if(("data_table" %in% input$sidebarMenu) & ("Sex" %in% input$selected_filter_topics)) {
+    if(("catalogue" %in% input$sidebarMenu) & ("Sex" %in% input$selected_filter_topics)) {
       sex
-    } else if ("data_table" %in% input$sidebarMenu) {
+    } else if ("catalogue" %in% input$sidebarMenu) {
       sex |> hidden()
     }
   })
   
   
   
+  ##Source ----
+  output$source_selector <- renderUI({
+    
+    sources <- textInput(
+      inputId = "selected_sources",
+      label = "Data source(s):",
+      value = "",
+      placeholder = "Search only the Data source(s) column"
+    )
+    
+    
+    if(("catalogue" %in% input$sidebarMenu) & ("Data source(s)" %in% input$selected_filter_topics)) {
+      sources
+    } else if ("catalogue" %in% input$sidebarMenu) {
+      sources |> hidden()
+    }
+  })
+  
+  source_search_list <- reactive({
+    if(length(input$selected_sources) == 1) {
+      return(str_split_1(str_to_lower(input$selected_sources), " "))
+    } else {
+      return("")
+    }
+  })
+  
+  
   ##Reset button ----
   output$reset_button <- renderUI({
-    if("data_table" %in% input$sidebarMenu) {
+    if("catalogue" %in% input$sidebarMenu) {
       actionBttn(inputId = "reset",
                  label = "Reset filters",
                  color = "danger")
@@ -445,39 +421,43 @@ function(input, output, session){
   filtered_dataset <- reactive({
     dataset |>
       filter(search_string_and(string = Chr_merge, pattern_list = search_list()),
-             
+
              search_string_and(string = str_to_lower(Label), pattern_list = label_search_list()),
-             
-             Type %in% input$selected_item_types,
+
+             search_string_and(string = str_to_lower(`Data source(s)`), pattern_list = source_search_list()),
+
+             search_string_or(string = Type, pattern_list = input$selected_item_types),
              
              search_string_or(string = Tags, pattern_list = input$selected_tags),
              search_string_or(string = Equality, pattern_list = input$selected_equalities),
              search_string_or(string = Geographies, pattern_list = input$selected_geographies),
              search_string_or(string = `Health & wellbeing topic`, pattern_list = input$selected_hw_topics),
-             
+
              ((`Produced by PHS` %in% input$selected_int_ext) | (is.na(`Produced by PHS`) & "[blank]" %in% input$selected_int_ext)),
-             
+
              ((Sex %in% input$selected_sex) | (is.na(Sex) & "[blank]" %in% input$selected_sex))
              ) |>
-      select(all_of(input$selected_columns))
+      select(Buttons, all_of(input$selected_columns))
   })
   
   
   
   output$main_table <- renderDT({
-    
-    datatable(filtered_dataset(),
-              options = list(scrollX = TRUE,
-                             scrollY = "50vh",
-                             scrollCollapse = TRUE,
-                             searching = FALSE
-                             )
-              )
+    if (length(filtered_dataset()) >= 1) {
+      datatable(filtered_dataset(),
+                escape = F,
+                options = list(scrollX = TRUE,
+                               scrollY = "50vh",
+                               scrollCollapse = TRUE,
+                               searching = FALSE
+                               )
+                )
+    }
     
   })
   
   output$download_table <- renderUI({
-    if("data_table" %in% input$sidebarMenu){
+    if("catalogue" %in% input$sidebarMenu){
       downloadBttn(outputId = "download", #button to download data
                    label = "Download table",
                    icon = shiny::icon("download") |> rem_aria_label(),
@@ -519,16 +499,19 @@ function(input, output, session){
     
     versions <- c("0.1", 
                   "0.2",
+                  "0.3",
                   "1.0 (planned)"
                   )
     
     dates <- c("18 March 2024",
                "17 April 2024",
-               "__ _____ 2024"
+               "24 June 2024",
+               "Autumn 2024"
                )
     
     changes <- c("Basic skeleton of dashboard created",
                  "Pre-release alpha build deployed",
+                 "Functionality of dashboard expanded, catalogue data put into more consistent and standard formats.",
                  "Final release"
                  )
     
@@ -548,15 +531,128 @@ function(input, output, session){
   
   # output$testing <- renderPrint({
   #   str_view(c(
-  #     paste0("A: ", input$reset),
-  #     paste0("B: ", input$selected_columns_open),
-  #     paste0("C: ", search_list()),
-  #     paste0("D: ", search_list() |>
-  #              str_replace_all("\\W", "\\\\W") |>
-  #              str_flatten(")(?=.*") %>%
-  #              paste0("(?=.*", ., ").*"))
+  #     paste0("A: ", input$current_id),
+  #     paste0("B: ", parse_number(input$current_id))
   #     ))
   # })
 
+  
+  observeEvent(input$current_id, {
+
+    row <- parse_number(input$current_id)
+
+    modalDialog(
+      title = list(h1(dataset$Label[row]), 
+                   strong(dataset$Type[row] |> str_replace("[|]", "&"))),
+      
+      fluidRow(
+        
+        box(width = 12, solidHeader = TRUE,
+          p(dataset$Description[row])
+        ),
+        
+        
+        fluidRow(
+          box(width = 6, solidHeader = TRUE,
+              strong("Dashboard report name:"),
+              p(dataset$`Dashboard report name`[row] |> str_replace_all("[|]", ", "))
+          ),
+          
+          box(width = 6, solidHeader = TRUE,
+              strong("Link(s):"),
+              p(dataset$`Link(s)`[row]),
+              if(!is.na(dataset$`Link instructions`[row])) {
+                p(dataset$`Link instructions`[row])
+              }
+          )
+        ),
+        
+        
+        fluidRow(
+          box(width = 4, solidHeader = TRUE,
+              strong("Produced by PHS:"),
+              p(dataset$`Produced by PHS`[row])
+          ),
+          
+          box(width = 4, solidHeader = TRUE,
+              strong("Owner:"),
+              p(dataset$Owner[row])
+          ),
+          
+          box(width = 4, solidHeader = TRUE,
+              strong("Data source(s):"),
+              p(dataset$`Data source(s)`[row] |> str_replace_all("[|]", ", "))
+          )
+        ),
+        
+        
+        fluidRow(
+          box(width = 3, solidHeader = TRUE,
+              strong("Frequency:"),
+              p(dataset$Frequency[row])
+          ),
+          
+          box(width = 3, solidHeader = TRUE,
+              strong("Trends:"),
+              p(dataset$Trends[row])
+          ),
+          
+          box(width = 3, solidHeader = TRUE,
+              strong("Last updated:"),
+              p(dataset$`Last updated`[row])
+          ),
+          
+          box(width = 3, solidHeader = TRUE,
+              strong("Next updated:"),
+              p(dataset$`Next updated`[row])
+          )
+        ),
+        
+        
+        
+        fluidRow(
+          box(width = 4, solidHeader = TRUE,
+              strong("Equality:"),
+              p(dataset$Equality[row] |> str_replace_all("[|]", ", "))
+          ),
+          
+          box(width = 4, solidHeader = TRUE,
+              strong("Age:"),
+              p(dataset$Age[row])
+          ),
+  
+          box(width = 4, solidHeader = TRUE,
+              strong("Sex:"),
+              p(dataset$Sex[row])
+          )
+        ),
+        
+        
+        
+        
+        fluidRow(
+          box(width = 6, solidHeader = TRUE,
+              strong("Geographies:"),
+              p(dataset$Geographies[row] |> str_replace_all("[|]", ", "))
+          ),
+          
+          box(width = 6, solidHeader = TRUE,
+              strong("Health & wellbeing topic:"),
+              p(dataset$`Health & wellbeing topic`[row] |> str_replace_all("[|]", ", ")),
+              strong("Tags:"),
+              p(dataset$Tags[row] |> str_replace_all("[|]", ", "))
+          )
+        )
+        
+        
+      ),
+      
+      size = "l",
+      easyClose = TRUE,
+      footer = modalButton("Close")
+    ) |> showModal()
+  })
+  
+  
   
 }

@@ -39,11 +39,6 @@ credentials <- data.frame(user = username, password = password, stringsAsFactors
 load("www/dataset.Rdata")
 
 
-# dataset <- dataset |>
-#   bind_cols(tidyr::unite(dataset, chr_merge, everything(), na.rm = TRUE, sep = " ") |> mutate(chr_merge = str_to_lower(chr_merge)))
-
-
-
 definitions <- openxlsx::read.xlsx("www/definitions.xlsx")
 
 names(definitions) <- names(definitions) |>
