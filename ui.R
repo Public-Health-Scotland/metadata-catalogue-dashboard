@@ -23,7 +23,7 @@ header <- dashboardHeader(
   # ),
   
   tags$li(class = "dropdown",
-          tags$p("Health & Wellbeing Catalogue Dashboard v0.2")
+          tags$p("Health & Wellbeing Catalogue Dashboard v0.3")
   )
 )
 
@@ -414,7 +414,7 @@ ui <- tagList( #needed for shinyjs
     body
   ), # dashboardPage
   
-  shiny::includeScript("script.js")
+  includeScript("www/script.js")
 )
 
 

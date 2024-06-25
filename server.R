@@ -505,7 +505,7 @@ function(input, output, session){
     
     dates <- c("18 March 2024",
                "17 April 2024",
-               "24 June 2024",
+               "25 June 2024",
                "Autumn 2024"
                )
     
@@ -526,38 +526,38 @@ function(input, output, session){
   
   
   
-  #Testing! ----
-  #dev panel to display underlying values, uncomment to include
   
-  # output$testing <- renderPrint({
-  #   str_view(c(
-  #     paste0("A: ", input$current_id),
-  #     paste0("B: ", parse_number(input$current_id))
-  #     ))
-  # })
+  
+  
+  
 
-  
+  #Pop-up boxes ----
   observeEvent(input$current_id, {
 
-    row <- parse_number(input$current_id)
+    if(is.character(input$current_id)) {
+      row <- as.numeric(str_extract(input$current_id, "\\d*$")) #parse_number(input$current_id)
+    } else {
+      row <- 1
+    }
 
     modalDialog(
-      title = list(h1(dataset$Label[row]), 
+      title = list(h1(dataset$Label[row]),
                    strong(dataset$Type[row] |> str_replace("[|]", "&"))),
-      
+
       fluidRow(
-        
-        box(width = 12, solidHeader = TRUE,
-          p(dataset$Description[row])
+
+        fluidRow(
+          box(width = 12, solidHeader = TRUE,
+            p(dataset$Description[row])
+          )
         ),
-        
-        
+
         fluidRow(
           box(width = 6, solidHeader = TRUE,
               strong("Dashboard report name:"),
               p(dataset$`Dashboard report name`[row] |> str_replace_all("[|]", ", "))
           ),
-          
+
           box(width = 6, solidHeader = TRUE,
               strong("Link(s):"),
               p(dataset$`Link(s)`[row]),
@@ -566,76 +566,76 @@ function(input, output, session){
               }
           )
         ),
-        
-        
+
+
         fluidRow(
           box(width = 4, solidHeader = TRUE,
               strong("Produced by PHS:"),
               p(dataset$`Produced by PHS`[row])
           ),
-          
+
           box(width = 4, solidHeader = TRUE,
               strong("Owner:"),
               p(dataset$Owner[row])
           ),
-          
+
           box(width = 4, solidHeader = TRUE,
               strong("Data source(s):"),
               p(dataset$`Data source(s)`[row] |> str_replace_all("[|]", ", "))
           )
         ),
-        
-        
+
+
         fluidRow(
           box(width = 3, solidHeader = TRUE,
               strong("Frequency:"),
               p(dataset$Frequency[row])
           ),
-          
+
           box(width = 3, solidHeader = TRUE,
               strong("Trends:"),
               p(dataset$Trends[row])
           ),
-          
+
           box(width = 3, solidHeader = TRUE,
               strong("Last updated:"),
               p(dataset$`Last updated`[row])
           ),
-          
+
           box(width = 3, solidHeader = TRUE,
               strong("Next updated:"),
               p(dataset$`Next updated`[row])
           )
         ),
-        
-        
-        
+
+
+
         fluidRow(
           box(width = 4, solidHeader = TRUE,
               strong("Equality:"),
               p(dataset$Equality[row] |> str_replace_all("[|]", ", "))
           ),
-          
+
           box(width = 4, solidHeader = TRUE,
               strong("Age:"),
               p(dataset$Age[row])
           ),
-  
+
           box(width = 4, solidHeader = TRUE,
               strong("Sex:"),
               p(dataset$Sex[row])
           )
         ),
-        
-        
-        
-        
+
+
+
+
         fluidRow(
           box(width = 6, solidHeader = TRUE,
               strong("Geographies:"),
               p(dataset$Geographies[row] |> str_replace_all("[|]", ", "))
           ),
-          
+
           box(width = 6, solidHeader = TRUE,
               strong("Health & wellbeing topic:"),
               p(dataset$`Health & wellbeing topic`[row] |> str_replace_all("[|]", ", ")),
@@ -643,15 +643,34 @@ function(input, output, session){
               p(dataset$Tags[row] |> str_replace_all("[|]", ", "))
           )
         )
-        
-        
+
+
       ),
-      
+
       size = "l",
       easyClose = TRUE,
       footer = modalButton("Close")
     ) |> showModal()
   })
+
+  
+  
+  
+  
+  
+  
+  #Testing! ----
+  #dev panel to display underlying values, uncomment to include
+  
+  # output$testing <- renderPrint({
+  #   str_view(c(
+  #     paste0("A: ", input$current_id),
+  #     paste0("B: ", as.numeric(str_extract(input$current_id, "\\d*$")))
+  #     ))
+  # })
+
+  
+  
   
   
   
