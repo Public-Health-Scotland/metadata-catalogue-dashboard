@@ -84,7 +84,7 @@ function(input, output, session){
       pickerInput(
         inputId = "selected_columns",
         label = "Columns to display:",
-        choices = names(dataset)[-((length(names(dataset))-1):length(names(dataset)))], 
+        choices = names(dataset)[!(names(dataset) %in% c("Buttons", "Chr_merge"))], 
         selected = selected$columns, 
         multiple = TRUE,
         options = pickerOptions(actionsBox = TRUE,
@@ -402,9 +402,8 @@ function(input, output, session){
   ##Reset button ----
   output$reset_button <- renderUI({
     if("catalogue" %in% input$sidebarMenu) {
-      actionBttn(inputId = "reset",
-                 label = "Reset filters",
-                 color = "danger")
+      actionButton(inputId = "reset",
+                 label = "Reset filters")
     }
   })
   
@@ -444,7 +443,17 @@ function(input, output, session){
   
   output$main_table <- renderDT({
     if (length(filtered_dataset()) >= 1) {
-      datatable(filtered_dataset(),
+      
+      if("Link(s)" %in% input$selected_columns) {
+        data <- filtered_dataset() |>
+          mutate(`Link(s)` = str_replace_all(`Link(s)`, "(^|\\r\\n)(.*)(?=$|\\r\\n)", 
+                                             '<a href = \\2 target = "_blank"><u>\\2</u></a> '))
+      } else {
+        data <- filtered_dataset()
+      }
+      
+      
+      datatable(data,
                 escape = F,
                 options = list(scrollX = TRUE,
                                scrollY = "50vh",
@@ -456,24 +465,123 @@ function(input, output, session){
     
   })
   
-  output$download_table <- renderUI({
-    if("catalogue" %in% input$sidebarMenu){
-      downloadBttn(outputId = "download", #button to download data
-                   label = "Download table",
-                   icon = shiny::icon("download") |> rem_aria_label(),
-                   color = "royal"
-      )
-    }
-  })
   
   
+  #Downloads ----
   output$download <- downloadHandler(
     
-    filename = paste0("metadata_download_", 
+    filename = paste0("metadata_catalogue_download_", 
                       today() |> as.character() |> str_replace_all("-", "_"),
                       ".xlsx"),
     
-    content = \(file) { openxlsx::write.xlsx(filtered_dataset(), file) }
+    content = \(file) { 
+      #openxlsx::write.xlsx(filtered_dataset() |> select(-Buttons), file) 
+      
+      
+      #load in the download template
+      wb <- loadWorkbook("www/catalogue_download_template.xlsx")
+      
+      
+      
+      #add the filtered data to the first page
+      writeDataTable(wb, 
+                     sheet = 1, 
+                     startRow = 5,
+                     x = filtered_dataset() |> select(-Buttons),
+                     tableStyle = "TableStyleLight1", #table style with good colour contrast
+                     tableName = "filtered_catalogue"
+                     )
+      addStyle(wb, 
+               sheet = 1,
+               rows = 5:(5+length(filtered_dataset()$Buttons)),
+               cols = 1:length(names(filtered_dataset())),
+               gridExpand = TRUE,
+               stack = TRUE,
+               style = createStyle(wrapText = TRUE, valign = "center")
+               )
+      
+      if("Description" %in% names(filtered_dataset())) {
+        setColWidths(wb,
+                     sheet = 1,
+                     cols = (which("Description" == names(filtered_dataset())) - 1),
+                     width = 35
+                     )
+      }
+      
+      
+      
+      #add list of filters used to the second sheet
+      writeDataTable(wb,
+                     sheet = 2,
+                     startRow = 3,
+                     x = tibble(
+                       `Filter name` = c(
+                         "General Search", 
+                         "Columns selected", 
+                         "Label", 
+                         "Health & wellbeing topic", 
+                         "Tags",
+                         "Type", 
+                         "Produced by PHS", 
+                         "Data source(s)", 
+                         "Sex", 
+                         "Equality", 
+                         "Geographies"
+                         ),
+                       `Options included` = c(
+                         if_else(input$general_search != "", paste0('"',input$general_search,'"'), "FILTER NOT USED"),
+                         str_flatten_comma(input$selected_columns),
+                         if_else(("Label" %in% input$selected_filter_topics & input$selected_labels != ""), paste0('"',input$selected_labels,'"'), "FILTER NOT USED"),
+                         if_else("Health & wellbeing topic" %in% input$selected_filter_topics, str_flatten_comma(input$selected_hw_topics), "FILTER NOT USED"),
+                         if_else("Tags" %in% input$selected_filter_topics, str_flatten_comma(input$selected_tags), "FILTER NOT USED"),
+                         if_else("Type" %in% input$selected_filter_topics, str_flatten_comma(input$selected_item_types), "FILTER NOT USED"),
+                         if_else("Produced by PHS" %in% input$selected_filter_topics, str_flatten_comma(input$selected_int_ext), "FILTER NOT USED"),
+                         if_else(("Data source(s)" %in% input$selected_filter_topics & input$selected_sources != ""), paste0('"', input$selected_sources, '"'), "FILTER NOT USED"),
+                         if_else("Sex" %in% input$selected_filter_topics, str_flatten_comma(input$selected_sex), "FILTER NOT USED"),
+                         if_else("Equality" %in% input$selected_filter_topics, str_flatten_comma(input$selected_equalities), "FILTER NOT USED"),
+                         if_else("Geographies" %in% input$selected_filter_topics, str_flatten_comma(input$selected_geographies), "FILTER NOT USED")
+                         )
+                       ), #tibble
+                     tableStyle = "TableStyleLight1",
+                     tableName = "filters_used"
+                     ) #writeDataTable
+      
+      addStyle(wb, 
+               sheet = 2,
+               rows = 3:14,
+               cols = 1:2,
+               gridExpand = TRUE,
+               stack = TRUE,
+               style = createStyle(wrapText = TRUE, valign = "center")
+      )
+      
+      
+      
+      
+      #add the relevant definitions to the third sheet
+      writeDataTable(wb,
+                     sheet = 3,
+                     startRow = 3,
+                     x = definitions |> 
+                       select(`Column name`, `Data type`, Definition, `Possible values`) |> 
+                       filter(`Column name` %in% input$selected_columns),
+                     tableStyle = "TableStyleLight1",
+                     tableName = "definitions"
+                     )
+      
+      addStyle(wb, 
+               sheet = 3,
+               rows = 3:(3+length(names(filtered_dataset()))),
+               cols = 1:4,
+               gridExpand = TRUE,
+               stack = TRUE,
+               style = createStyle(wrapText = TRUE, valign = "center")
+      )
+      
+      
+      saveWorkbook(wb, file)
+      
+      }
       
   )
   
@@ -560,7 +668,8 @@ function(input, output, session){
 
           box(width = 6, solidHeader = TRUE,
               strong("Link(s):"),
-              p(dataset$`Link(s)`[row]),
+              p(HTML(dataset$`Link(s)`[row] |> str_replace_all("(^|\\r\\n)(.*)(?=$|\\r\\n)", 
+                                                               '<a href = \\2 target = "_blank"><u>\\2</u></a> '))),
               if(!is.na(dataset$`Link instructions`[row])) {
                 p(dataset$`Link instructions`[row])
               }

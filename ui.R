@@ -78,7 +78,6 @@ sidebar <- dashboardSidebar(
       uiOutput("source_selector"),
       
       uiOutput("reset_button"),
-      uiOutput("download_table"),
       
       
       verbatimTextOutput("testing") #dev panel for testing things
@@ -138,7 +137,7 @@ home <- tabItem(
                           
                           p("The dashboard allows quick identification of relevant metrics across wide 
                             range of topic areas and sources rather than searching multiple places.")
-                      ),
+                      ) |> rem_button_aria_label(),
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
@@ -164,7 +163,7 @@ home <- tabItem(
                             img(src = "sidebar_toggle.png", alt = "screenshot of the sidebar toggle button"),
                             " at the top of the screen.")
                           
-                      ), 
+                      ) |> rem_button_aria_label(), 
                       
                       
                       
@@ -177,7 +176,7 @@ home <- tabItem(
                             within each item. Where possible, this tab also provides a list of possible 
                             values the user can select from.")
                           
-                      ), 
+                      ) |> rem_button_aria_label(), 
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
@@ -191,7 +190,7 @@ home <- tabItem(
                             This option is particularly useful for visualising connections between dashboards
                             and information gaps by topic area.")
                           
-                      ), 
+                      ) |> rem_button_aria_label(), 
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
@@ -205,7 +204,7 @@ home <- tabItem(
                                    tags$u("phs.metadatacatalogue@phs.scot")), 
                             "for more information or to provide feedback.")
                           
-                      ) 
+                      ) |> rem_button_aria_label() 
                       
                     ) #fluidRow
            ) #tabPanel 
@@ -234,7 +233,17 @@ catalogue <- tabItem(
            
            tabPanel(title = "Catalogue",
              fluidRow(
-               DTOutput("main_table")
+
+                 downloadButton(outputId = "download", #button to download data
+                                label = "Download table",
+                                icon = shiny::icon("download") |> rem_aria_label(),
+                                style = "float:right"
+                                ),
+                 
+                 DTOutput("main_table"),
+               
+               br(),
+               p("Catalogue last updated on ", last_updated)
              )
            )
     )

@@ -12,7 +12,7 @@ library(lubridate)
 #library(data.table)
 library(DT)
 library(plotly)
-#library(openxlsx)
+library(openxlsx)
 
 library(shiny)
 library(shinymanager)
@@ -39,7 +39,8 @@ credentials <- data.frame(user = username, password = password, stringsAsFactors
 load("www/dataset.Rdata")
 
 
-definitions <- openxlsx::read.xlsx("www/definitions.xlsx")
+
+definitions <- openxlsx::read.xlsx("www/definitions.xlsx") 
 
 names(definitions) <- names(definitions) |>
   str_replace_all("\\.", " ")
