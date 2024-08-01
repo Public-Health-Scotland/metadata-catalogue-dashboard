@@ -16,14 +16,8 @@ dashboardtitle <- tags$a(href = "https://www.publichealthscotland.scot/",
 header <- dashboardHeader(
   title = dashboardtitle,
   titleWidth = 290,
-  
-  # tags$li(class = "dropdown",
-  #   menuItem("Test",
-  #            tabName = "test")
-  # ),
-  
   tags$li(class = "dropdown",
-          tags$p("Health & Wellbeing Catalogue Dashboard v0.3")
+          tags$p("Health & Wellbeing Metadata Catalogue Dashboard v0.4")
   )
 )
 
@@ -46,13 +40,17 @@ sidebar <- dashboardSidebar(
                icon = icon("house", verify_fa = FALSE) |> rem_aria_label(),
                selected = TRUE),
       
-      menuItem("Catalogue",
+      menuItem("Metadata catalogue",
                tabName = "catalogue",
                icon = icon("table", verify_fa = FALSE) |> rem_aria_label()),
       
       menuItem("Definitions",
                tabName = "definitions",
                icon = icon("info-circle", verify_fa = FALSE) |> rem_aria_label()),
+      
+      # menuItem("Summary",
+      #          tabName = "summary",
+      #          icon = icon("chart-simple", verify_fa = FALSE) |> rem_aria_label()),
       
       menuItem("Visualisation",
                tabName = "visualisation",
@@ -121,46 +119,89 @@ home <- tabItem(
                           collapsible = TRUE, collapsed = TRUE,
                           title = p(strong("What is this dashboard?")),
                           
-                          p("This metadata catalogue provides a single source from which to search for 
-                            all publicly available health and wellbeing indicators for Scotland. It has
-                            been developed to make it easier to find and use existing intelligence for 
-                            learning and decision making related to health and wellbeing."),
+                          p("This metadata catalogue provides metadata on easily accessible*,
+                            publicly available health and wellbeing indicators for Scotland.
+                            It provides information on the indicators, including what data is
+                            available, but the metadata catalogue does provide the actual data."),
+		            
+                          p("It has been developed to make it easier to find and use existing
+                            intelligence for learning and decision making related to health and
+                            wellbeing."),
                           
-                          p("The catalogue includes data from Public Health Scotland, as well as from 
-                            other data owners such as the Office for National Statistics, National Records
-                            of Scotland, and Scottish Government."),
+                          p("The catalogue includes data from Public Health Scotland, as well 
+                            as from other data owners such as the Office for National Statistics,
+                            National Records of Scotland, and Scottish Government."),
                           
-                          p("Indicators from each publication are grouped by category, providing an 
-                            overview of available metrics by topic area. Each indicator has a metadata 
-                            profile that provides available detail on that item, for example, frequency
-                            of data updates, categorical breakdowns, and data source."),
+                          p("Indicators from each publication are grouped by category, providing
+                            an overview of available metrics by topic area. Each indicator has
+                            a metadata profile that provides available detail on that item, for 
+                            example, frequency of data updates, categorical breakdowns, and data
+                            source."),
                           
-                          p("The dashboard allows quick identification of relevant metrics across wide 
-                            range of topic areas and sources rather than searching multiple places.")
+                          p("The dashboard allows quick identification of relevant metrics 
+                            across wide range of topic areas and sources rather than searching
+                            multiple places."),
+                          
+                          h3("How did we decide what indicators to include?"),
+                          
+                          div(HTML("<ul>
+                          <li><strong>*Easily accessible:</strong> it is accessible in a dashboard or report.
+                          Indicators that require data manipulation of the parent dataset 
+                          to extract the data have not been included. </li>
+
+                          <li><strong>Contemporary:</strong> only data that is routinely updated is included.
+                          Data that is no longer updated but is not older that 10 years old 
+                          is also included. Datasets that are not currently updated and are 
+                          older than 10 years of age are removed from the catalogue. </li>
+
+                          <li><strong>Scotland:</strong> only datasets that include Scotland are included. </li>
+
+                          <li><strong>Population level:</strong> contains various influential details such as 
+                          births, deaths, and demographic information such as age, sex, 
+                          deprivation, annual income, etc. </li>
+                                   </ul>")),
+                          
+                          
                       ) |> rem_button_aria_label(),
                       
                       
                       #boxes with collapsible=TRUE below make the sections on the homepage collapsible
                       box(width = 12,
                           collapsible = TRUE, collapsed = TRUE,
-                          title = p(strong("Using the Data Catalogue")),
+                          title = p(strong("Using the data catalogue")),
                           
-                          p("The Catalogue tab displays a table, with each row being a dashboard, 
-                            publication or indicator, and each column a category of metadata for the
-                            row item. The default setting displays three columns (label, dashboard report 
-                            name and health & wellbeing topic) but more metadata columns can be added by
-                            selecting additional items from the ‘Columns to display’ drop downs."),
+                          p("The metadata catalogue provides information in table format."),
                           
-                          p("Controls in the sidebar allow you to filter and search the catalogue, for 
-                            example by geography, equalities, or data source."),
+                          p("Each row is either a:"),
+                          
+                          div(HTML("<ul>
+                          <li>dashboard, </li>
+                          <li>publication or </li>
+                          <li>indicator </li>
+                                   </ul>")),
+                          
+                          
+                          p("There is a range of metadata provided for the dashboards, 
+                            publication or indicators. The default setting displays only 
+                            three columns (label, dashboard/report name and health &
+                            wellbeing topic). More metadata information can be displayed 
+                            by selecting additional items from the ‘Columns to display’ 
+                            drop downs."),
+                          
+                          p("Controls in the sidebar allow you to filter and search the 
+                            catalogue, for example by geography, equalities, or data source."),
                           
                           p("There is a download button which looks like this:",
-                            img(src = "download_button_sidebar.png", alt = "screenshot of the download button"), 
-                            ". This will allow the user to download the metadata table as an Excel document.
-                            The metadata downloaded will have the chosen filters applied."),
+                            img(src = "download_button.png", 
+                                alt = "screenshot of the download button"), 
+                            "This will allow the user to download the metadata table 
+                            as an Excel document. The metadata downloaded will have the 
+                            chosen filters applied."),
                           
-                          p("The left-hand menu can be hidden and revealed by clicking on this toggle button ",
-                            img(src = "sidebar_toggle.png", alt = "screenshot of the sidebar toggle button"),
+                          p("The left-hand menu can be hidden and revealed by clicking 
+                            on this toggle button ",
+                            img(src = "sidebar_toggle.png", 
+                                alt = "screenshot of the sidebar toggle button"),
                             " at the top of the screen.")
                           
                       ) |> rem_button_aria_label(), 
@@ -207,7 +248,111 @@ home <- tabItem(
                       ) |> rem_button_aria_label() 
                       
                     ) #fluidRow
-           ) #tabPanel 
+           ), #tabPanel
+           
+           
+           
+           ##Summary ----
+           tabPanel(title = "Summary",
+                    
+                    fluidRow(
+                      box(width = 8,  solidHeader = TRUE,
+                          
+                          h1("Metadata Catalogue Summary"),
+                          
+                          p("This page gives a summary of the metadata stored in this catalogue.
+                            Each chart has been created to be interactible, and hovering over the
+                            charts will allow you to see more detail for each. Note that in many 
+                            cases the total number of items included in the chart may seem to exceed
+                            the number of rows in the catalogue. In these cases, this is caused by
+                            individual rows counting towards multiple categories at once, meaning it
+                            will be counted multiple times."),
+                          
+                          p("The catalogue has a total of ", tags$b(as.character(length(dataset[[1]]))),
+                            " rows, which are each either an indicator, a dashboard, or a statistical report. 
+                          The proportions of these row types are shown in the pie chart to the right."),
+                          
+                          htmlOutput("int_ext_text")
+                          
+                      ),
+                      
+                      box(width = 4, solidHeader = TRUE,
+                          plotlyOutput("type_chart")
+                      )
+                    ), #fluidRow
+                    
+                    
+                    fluidRow(
+                      
+                      box(width = 8, solidHeader = TRUE,
+                          plotlyOutput("hw_topic_chart")
+                      ),
+                      
+                      box(width = 4, solidHeader = TRUE,
+                          
+                          h2("Health & wellbeing topic"),
+                          
+                          p("The indicators in this catalogue are split between ",
+                            tags$b(as.character(length(hw_topic_options)-1)),
+                            " different health and wellbeing topics. The bar graph
+                            to the left shows how many rows are related with each topic."),
+                          
+                          htmlOutput("hw_topic_text")
+                          
+                      )
+                    ), #fluidRow
+                    
+                    
+                    fluidRow(
+                      
+                      box(width = 5, solidHeader = TRUE,
+                          h2("Tags"),
+                          
+                          p("The entries in the catalogue are each given tags to help 
+                            sort them into groups. There are currently ",
+                            tags$b(as.character(length(tag_options)-1)),
+                            " different tags throughout the catalogue."),
+                          
+                          p("A word cloud has been used to show the relative frequency
+                            of each tag. This format was chosen because the number of 
+                            different tags is large enough to make other categorical plots
+                            unreadable."),
+                          
+                          htmlOutput("tags_text")
+                      ),
+                      
+                      box(width = 7, solidHeader = TRUE,
+                          plotOutput("tags_chart")
+                      )
+                    ), #fluidRow
+                    
+                    
+                    fluidRow(
+                      box(width = 8, solidHeader = TRUE,
+                          plotlyOutput("geographies_chart")
+                      ),
+                      
+                      box(width = 4, solidHeader = TRUE,
+                          h2("Geographies"),
+                          
+                          p("Each of the indicators, dashboard and statistical reports give 
+                            breakdowns of different types of geography. In total there are ",
+                            tags$b(as.character(length(geographies_options))),
+                            " different geographical categorisations used."),
+                          
+                          htmlOutput("geographies_text")
+                      )
+                    ), #fluidRow
+                    
+                    
+                    fluidRow(
+                      box(width = 12, solidHeader = TRUE,
+                          p("Metadata catalogue last updated on ", last_updated)
+                      )
+                    )
+                    
+           ) #tabPanel
+           
     ) #tabBox
   ) #fluidRow
 ) #tabItem
@@ -226,12 +371,12 @@ home <- tabItem(
 catalogue <- tabItem(
   tabName = "catalogue",
   fluidRow(
-    tabBox(title = "Catalogue",
+    tabBox(title = "Metadata Catalogue",
            # The id lets us use input$home_tab on the server to find the current tab
            id = "catalogue_tab",
            width = 12,
            
-           tabPanel(title = "Catalogue",
+           tabPanel(title = "Metadata catalogue",
              fluidRow(
 
                  downloadButton(outputId = "download", #button to download data
@@ -243,12 +388,12 @@ catalogue <- tabItem(
                  DTOutput("main_table"),
                
                br(),
-               p("Catalogue last updated on ", last_updated)
-             )
-           )
-    )
-  )
-)
+               p("Metadata catalogue last updated on ", last_updated)
+             ) #fluidRow
+           ) #tabPanel
+    ) #tabBox
+  ) #fluidRow
+) #tabItem
 
 
 
@@ -265,7 +410,7 @@ definitions <- tabItem(
            
            tabPanel(title = "Definitions",
                     fluidRow(
-                      box(width = 10,
+                      box(width = 10, solidHeader = TRUE,
                         h1("Definitions"),
                         p("Each of the columns in the data table are defined here."), 
                         tableOutput("definitions_table"),
@@ -278,6 +423,120 @@ definitions <- tabItem(
   )
 )
 
+
+
+
+#Summary----
+# summary <- tabItem(
+#   tabName = "summary",
+#   fluidRow(
+#     tabBox(title = "Summary",
+#            id = "summary_tab",
+#            width = 12,
+
+           # tabPanel(title = "Summary",
+           # 
+           #          fluidRow(
+           #            box(width = 8,  solidHeader = TRUE,
+           #                
+           #                h1("Catalogue Summary"),
+           #                
+           #                p("This page gives a summary of the metadata stored in this catalogue.
+           #                  Each chart has been created to be interactible, and hovering over the
+           #                  charts will allow you to see more detail for each. Note that in many 
+           #                  cases the total number of items included in the chart may seem to exceed
+           #                  the number of rows in the catalogue. In these cases, this is caused by
+           #                  individual rows counting towards multiple categories at once, meaning it
+           #                  will be counted multiple times."),
+           #                
+           #                p("The catalogue has a total of ", tags$b(as.character(length(dataset[[1]]))),
+           #                " rows, which are each either an indicator, a dashboard, or a statistical report. 
+           #                The proportions of these row types are shown in the pie chart to the right."),
+           #                
+           #                htmlOutput("int_ext_text")
+           #                
+           #                ),
+           # 
+           #            box(width = 4, solidHeader = TRUE,
+           #                plotlyOutput("type_chart")
+           #                )
+           #            ), #fluidRow
+           #          
+           #          
+           #          fluidRow(
+           #            
+           #            box(width = 8, solidHeader = TRUE,
+           #                plotlyOutput("hw_topic_chart")
+           #                ),
+           #            
+           #            box(width = 4, solidHeader = TRUE,
+           #                
+           #                h2("Health & wellbeing topic"),
+           #                
+           #                p("The indicators in this catalogue are split between ",
+           #                  tags$b(as.character(length(hw_topic_options)-1)),
+           #                  " different health and wellbeing topics. The bar graph
+           #                  to the left shows how many rows are related with each topic."),
+           #                
+           #                htmlOutput("hw_topic_text")
+           #                
+           #                )
+           #          ), #fluidRow
+           #          
+           #          
+           #          fluidRow(
+           #            
+           #            box(width = 5, solidHeader = TRUE,
+           #                h2("Tags"),
+           #                
+           #                p("The entries in the catalogue are each given tags to help 
+           #                  sort them into groups. There are currently ",
+           #                  tags$b(as.character(length(tag_options)-1)),
+           #                  " different tags throughout the catalogue."),
+           #                
+           #                p("A word cloud has been used to show the relative frequency
+           #                  of each tag. This format was chosen because the number of 
+           #                  different tags is large enough to make other categorical plots
+           #                  unreadable."),
+           #                
+           #                htmlOutput("tags_text")
+           #                ),
+           #            
+           #            box(width = 7, solidHeader = TRUE,
+           #                plotOutput("tags_chart")
+           #                )
+           #          ), #fluidRow
+           #          
+           #          
+           #          fluidRow(
+           #            box(width = 8, solidHeader = TRUE,
+           #                plotlyOutput("geographies_chart")
+           #                ),
+           #            
+           #            box(width = 4, solidHeader = TRUE,
+           #                h2("Geographies"),
+           #                
+           #                p("Each of the indicators, dashboard and statistical reports give 
+           #                  breakdowns of different types of geography. In total there are ",
+           #                  tags$b(as.character(length(geographies_options))),
+           #                  " different geographical categorisations used."),
+           #                
+           #                htmlOutput("geographies_text")
+           #            )
+           #          ), #fluidRow
+           #          
+           #          
+           #          fluidRow(
+           #            box(width = 12, solidHeader = TRUE,
+           #                p("Catalogue last updated on ", last_updated)
+           #                )
+           #          )
+           # 
+           #          ) #tabPanel
+# 
+#     ) #tabBox
+#   ) #fluidRow
+# ) #tabItem
 
 
 
@@ -351,28 +610,6 @@ version <- tabItem(
 
 
 
-
-#Test tab ----
-test <- tabItem(
-  tabName = "test",
-  fluidRow(
-    tabBox(title = "Test",
-           # The id lets us use input$home_tab on the server to find the current tab
-           id = "test_tab",
-           width = 12,
-           
-           tabPanel(title = "Test",
-                    fluidRow(
-                      p("test")
-                    )
-           )
-    )
-  )
-)
-
-
-
-
 #.----
 #body ----
 #put together each of the tabItems created above
@@ -393,9 +630,9 @@ body <-
     tabItems(home,
              catalogue,
              definitions,
+             #summary,
              visualisation,
-             version,
-             test)
+             version)
   )
 
 

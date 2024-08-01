@@ -14,7 +14,7 @@ function(input, output, session){
   
   #Selected values ----
   #this "selected" section makes variables not reset when user navigates to another page
-  selected <- reactiveValues(columns = c("Label", "Dashboard report name", "Health & wellbeing topic"),
+  selected <- reactiveValues(columns = c("Label", "Dashboard or report name", "Health & wellbeing topic"),
                              filter_topics = character(0),
                              item_types = c("Indicator", "Dashboard", "Statistical report"),
                              tags = tag_options,
@@ -64,7 +64,7 @@ function(input, output, session){
         inputId = "general_search",
         label = "Search:",
         value = "",
-        placeholder = "Search the entire catalogue"
+        placeholder = "Search the entire metadata catalogue"
       )
     }
   }) 
@@ -408,7 +408,7 @@ function(input, output, session){
   })
   
   observeEvent(input$reset, {
-    selected$columns <- c("Label", "Dashboard report name", "Health & wellbeing topic")
+    selected$columns <- c("Label", "Dashboard or report name", "Health & wellbeing topic")
     selected$filter_topics <- character(0)
     }
     )
@@ -608,18 +608,21 @@ function(input, output, session){
     versions <- c("0.1", 
                   "0.2",
                   "0.3",
+                  "0.4",
                   "1.0 (planned)"
                   )
     
     dates <- c("18 March 2024",
                "17 April 2024",
                "25 June 2024",
+               "01 August 2024",
                "Autumn 2024"
                )
     
     changes <- c("Basic skeleton of dashboard created",
                  "Pre-release alpha build deployed",
                  "Functionality of dashboard expanded, catalogue data put into more consistent and standard formats.",
+                 "Added a summary tab to the home page to provide analytics for the metadata catalogue.",
                  "Final release"
                  )
     
@@ -662,8 +665,8 @@ function(input, output, session){
 
         fluidRow(
           box(width = 6, solidHeader = TRUE,
-              strong("Dashboard report name:"),
-              p(dataset$`Dashboard report name`[row] |> str_replace_all("[|]", ", "))
+              strong("Dashboard or report name:"),
+              p(dataset$`Dashboard or report name`[row] |> str_replace_all("[|]", ", "))
           ),
 
           box(width = 6, solidHeader = TRUE,
@@ -762,6 +765,165 @@ function(input, output, session){
     ) |> showModal()
   })
 
+  
+  
+  
+  
+  #Summary tab ----
+  
+  
+  ## type ----
+  output$type_chart <- renderPlotly({
+    
+    types <- c("Indicator", "Dashboard", "Statistical report")
+    values <- map_int(types,
+                    \(x) {str_detect(dataset$Type, x) |> sum()})
+    
+    plot_ly(type = "pie",
+            labels = types,
+            values = values,
+            textposition = "inside",
+            textinfo = "label+percent",
+            showlegend = FALSE,
+            hovertemplate = "<b>%{label}</b><br>%{value} rows<extra></extra>",
+            marker = list(colors = c("#83BB26", "#9B4393", "#3F3685"))
+            ) |> 
+      config(displayModeBar = FALSE)
+  })
+  
+  
+  output$int_ext_text <- renderText({
+    
+    x <- dataset$`Produced by PHS` |> str_to_lower()
+    
+    yes <- sum(x == "yes")
+    no <- sum(x == "no")
+    
+    return(paste0("Of these, <b>", yes, "</b> are produced by PHS and <b>", no, "</b> are external."))
+    
+  })
+  
+  
+  ##hw topic ----
+  output$hw_topic_chart <- renderPlotly({
+    
+    values <- map_int(hw_topic_options,
+                             \(x) {str_detect(dataset$`Health & wellbeing topic`, x) |> sum()})
+    values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
+    
+    plot_ly(type = "bar",
+            x = hw_topic_options,
+            y = values,
+            hovertemplate = "<b>%{x}</b><br>%{y} rows<extra></extra>",
+            marker = list(color = "#0078D4")
+            ) |>
+      layout(xaxis = list(title = "", tickangle = -30)) |> 
+      config(displayModeBar = FALSE)
+    
+  })
+  
+  output$hw_topic_text <- renderText({
+    
+    values <- map_int(hw_topic_options,
+                      \(x) {str_detect(dataset$`Health & wellbeing topic`, x) |> sum()})
+    
+    values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
+    
+    max <- max(values)
+    
+    most_common <- hw_topic_options[values == max] |> str_flatten_comma(last = " and ")
+    
+    multiple <- length(hw_topic_options[values == max]) > 1
+    
+    plural <- if_else(multiple, "topics were", "topic was")
+    
+    
+    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    
+  })
+
+
+  
+  ##tags ----
+  output$tags_chart <- renderPlot({
+    values <- map_int(tag_options, 
+                      \(x) {str_detect(dataset$Tags, x) |> sum()})
+    
+    values[1] <- sum(is.na(dataset$Tags))
+    
+    set.seed(8)
+    
+    colours <- c("#3F3685", "#9B4393", "#0078D4", "#83BB26",
+                "#948DA3", "#1E7F84", "#6B5C85", "#C73918")
+    
+    
+    
+    wordcloud::wordcloud(words = tag_options,
+                         freq = values,
+                         colors = colours,
+                         random.color = TRUE,
+                         random.order = FALSE,
+                         rot.per = 0,
+                         fixed.asp = FALSE
+                         )
+  })
+  
+  
+  output$tags_text <- renderText({
+    values <- map_int(tag_options, 
+                      \(x) {str_detect(dataset$Tags, x) |> sum()})
+    
+    values[1] <- sum(is.na(dataset$Tags))
+    
+    max <- max(values)
+    
+    most_common <- tag_options[values == max] |> str_flatten_comma(last = " and ")
+    
+    multiple <- length(tag_options[values == max]) > 1
+    
+    plural <- if_else(multiple, "tags were", "tag was")
+    
+    
+    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    
+  })
+  
+  
+  
+  ##geographies ----
+  output$geographies_chart <- renderPlotly({
+    
+    values <- map_int(geographies_options, 
+                      \(x) {str_detect(dataset$Geographies, x) |> sum()})
+    
+    plot_ly(type = "bar",
+            x = values,
+            y = geographies_options,
+            hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
+            marker = list(color = "#9B4393")
+    ) |>
+      #layout(xaxis = list(title = "", tickangle = -30)) |> 
+      config(displayModeBar = FALSE)
+    
+  })
+  
+  
+  output$geographies_text <- renderText({
+    values <- map_int(geographies_options, 
+                      \(x) {str_detect(dataset$Geographies, x) |> sum()})
+    
+    max <- max(values)
+    
+    most_common <- geographies_options[values == max] |> str_flatten_comma(last = " and ")
+    
+    multiple <- length(geographies_options[values == max]) > 1
+    
+    plural <- if_else(multiple, "geographical breakdowns were", "geographical breakdown was")
+    
+    
+    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    
+  })
   
   
   

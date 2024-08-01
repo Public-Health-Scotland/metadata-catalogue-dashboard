@@ -2,7 +2,7 @@
 
 library(dplyr)
 #library(tidyr)
-#library(purrr)
+library(purrr)
 library(stringr)
 library(lubridate)
 #library(readr)
@@ -13,6 +13,7 @@ library(lubridate)
 library(DT)
 library(plotly)
 library(openxlsx)
+library(wordcloud)
 
 library(shiny)
 library(shinymanager)
