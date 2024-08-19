@@ -17,7 +17,7 @@ header <- dashboardHeader(
   title = dashboardtitle,
   titleWidth = 290,
   tags$li(class = "dropdown",
-          tags$p("Health & Wellbeing Metadata Catalogue Dashboard v0.4")
+          tags$p("Health & Wellbeing Metadata Catalogue Dashboard v1.0")
   )
 )
 
