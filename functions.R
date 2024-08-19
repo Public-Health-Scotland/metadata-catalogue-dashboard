@@ -1,9 +1,9 @@
 
 #function adds a loading spinner with phs-teal colour
 #wrap any output in this function to make it show this while it loads
-# loading <- function(whats_loading){
-#   withSpinner(whats_loading, type = 5, color = "#1E7F84", size = 0.5)
-# }
+loading <- function(whats_loading){
+  withSpinner(whats_loading, type = 5, color = "#1E7F84", size = 0.5)
+}
 
 
 

@@ -1,12 +1,12 @@
 #START OF SCRIPT ----
 
 library(dplyr)
-#library(tidyr)
+library(tidyr)
 library(purrr)
 library(stringr)
 library(lubridate)
 #library(readr)
-#library(forcats)
+library(forcats)
 
 #library(labelled)
 #library(data.table)

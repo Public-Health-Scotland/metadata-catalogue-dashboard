@@ -609,21 +609,21 @@ function(input, output, session){
                   "0.2",
                   "0.3",
                   "0.4",
-                  "1.0 (planned)"
+                  "1.0"
                   )
     
     dates <- c("18 March 2024",
                "17 April 2024",
                "25 June 2024",
                "01 August 2024",
-               "Autumn 2024"
+               "19 August 2024"
                )
     
-    changes <- c("Basic skeleton of dashboard created",
-                 "Pre-release alpha build deployed",
+    changes <- c("Basic skeleton of dashboard created.",
+                 "Pre-release alpha build deployed.",
                  "Functionality of dashboard expanded, catalogue data put into more consistent and standard formats.",
                  "Added a summary tab to the home page to provide analytics for the metadata catalogue.",
-                 "Final release"
+                 "Official release."
                  )
     
     tibble(Version = versions,
@@ -777,7 +777,7 @@ function(input, output, session){
     
     types <- c("Indicator", "Dashboard", "Statistical report")
     values <- map_int(types,
-                    \(x) {str_detect(dataset$Type, x) |> sum()})
+                    \(x) {str_detect((dataset$Type |> replace_na("")), x) |> sum()})
     
     plot_ly(type = "pie",
             labels = types,
@@ -794,12 +794,12 @@ function(input, output, session){
   
   output$int_ext_text <- renderText({
     
-    x <- dataset$`Produced by PHS` |> str_to_lower()
+    x <- dataset$`Produced by PHS` |> replace_na("") |> str_to_lower()
     
     yes <- sum(x == "yes")
     no <- sum(x == "no")
     
-    return(paste0("Of these, <b>", yes, "</b> are produced by PHS and <b>", no, "</b> are external."))
+    return(paste0("Of these, <b>", yes, "</b> are produced by PHS and <b>", no, "</b> are produced by other organisations."))
     
   })
   
@@ -807,12 +807,19 @@ function(input, output, session){
   ##hw topic ----
   output$hw_topic_chart <- renderPlotly({
     
+    options <- hw_topic_options
+    options[1] <- "No topic"
+    options <- fct(options)
+    
+    
     values <- map_int(hw_topic_options,
-                             \(x) {str_detect(dataset$`Health & wellbeing topic`, x) |> sum()})
+                             \(x) {str_detect((dataset$`Health & wellbeing topic` |> replace_na("")), x) |> sum()})
+    
     values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
     
+  
     plot_ly(type = "bar",
-            x = hw_topic_options,
+            x = options,
             y = values,
             hovertemplate = "<b>%{x}</b><br>%{y} rows<extra></extra>",
             marker = list(color = "#0078D4")
@@ -822,32 +829,32 @@ function(input, output, session){
     
   })
   
-  output$hw_topic_text <- renderText({
-    
-    values <- map_int(hw_topic_options,
-                      \(x) {str_detect(dataset$`Health & wellbeing topic`, x) |> sum()})
-    
-    values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
-    
-    max <- max(values)
-    
-    most_common <- hw_topic_options[values == max] |> str_flatten_comma(last = " and ")
-    
-    multiple <- length(hw_topic_options[values == max]) > 1
-    
-    plural <- if_else(multiple, "topics were", "topic was")
-    
-    
-    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
-    
-  })
+  # output$hw_topic_text <- renderText({
+  #   
+  #   options <- hw_topic_options[-1]
+  #   
+  #   values <- map_int(options,
+  #                     \(x) {str_detect((dataset$`Health & wellbeing topic` |> replace_na("")), x) |> sum()})
+  #   
+  #   max <- max(values)
+  #   
+  #   most_common <- options[values == max] |> str_flatten_comma(last = " and ")
+  #   
+  #   multiple <- length(options[values == max]) > 1
+  #   
+  #   plural <- if_else(multiple, "topics are", "topic is")
+  #   
+  #   
+  #   return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+  #   
+  # })
 
 
   
   ##tags ----
   output$tags_chart <- renderPlot({
     values <- map_int(tag_options, 
-                      \(x) {str_detect(dataset$Tags, x) |> sum()})
+                      \(x) {str_detect((dataset$Tags |> replace_na("")), x) |> sum()})
     
     values[1] <- sum(is.na(dataset$Tags))
     
@@ -870,21 +877,22 @@ function(input, output, session){
   
   
   output$tags_text <- renderText({
-    values <- map_int(tag_options, 
-                      \(x) {str_detect(dataset$Tags, x) |> sum()})
     
-    values[1] <- sum(is.na(dataset$Tags))
+    options <- tag_options[-1]
+    
+    values <- map_int(options, 
+                      \(x) {str_detect((dataset$Tags |> replace_na("")), x) |> sum()})
     
     max <- max(values)
     
-    most_common <- tag_options[values == max] |> str_flatten_comma(last = " and ")
+    most_common <- options[values == max] |> str_flatten_comma(last = " and ")
     
-    multiple <- length(tag_options[values == max]) > 1
+    multiple <- length(options[values == max]) > 1
     
-    plural <- if_else(multiple, "tags were", "tag was")
+    plural <- if_else(multiple, "tags are", "tag is")
     
     
-    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    return(paste0("The most frequent ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
     
   })
   
@@ -894,11 +902,12 @@ function(input, output, session){
   output$geographies_chart <- renderPlotly({
     
     values <- map_int(geographies_options, 
-                      \(x) {str_detect(dataset$Geographies, x) |> sum()})
+                      \(x) {str_detect((dataset$Geographies |> replace_na("")), x) |> sum()})
+    
     
     plot_ly(type = "bar",
             x = values,
-            y = geographies_options,
+            y = geographies_options |> reorder(length(geographies_options):1),
             hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
             marker = list(color = "#9B4393")
     ) |>
@@ -908,22 +917,77 @@ function(input, output, session){
   })
   
   
-  output$geographies_text <- renderText({
-    values <- map_int(geographies_options, 
-                      \(x) {str_detect(dataset$Geographies, x) |> sum()})
+  # output$geographies_text <- renderText({
+  #   values <- map_int(geographies_options, 
+  #                     \(x) {str_detect((dataset$Geographies |> replace_na("")), x) |> sum()})
+  #   
+  #   max <- max(values)
+  #   
+  #   most_common <- geographies_options[values == max] |> str_flatten_comma(last = " and ")
+  #   
+  #   multiple <- length(geographies_options[values == max]) > 1
+  #   
+  #   plural <- if_else(multiple, "geographical breakdowns are", "geographical breakdown is")
+  #   
+  #   
+  #   return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+  #   
+  # })
+  
+  
+  
+  
+  ##equality ----
+  output$equality_chart <- renderPlotly({
     
-    max <- max(values)
+    options <- equality_options
+    options[1] <- "None"
+    options <- reorder(options, length(options):1)
     
-    most_common <- geographies_options[values == max] |> str_flatten_comma(last = " and ")
+    values <- map_int(equality_options, 
+                      \(x) {str_detect((dataset$Equality |> replace_na("")), x) |> sum()})
     
-    multiple <- length(geographies_options[values == max]) > 1
-    
-    plural <- if_else(multiple, "geographical breakdowns were", "geographical breakdown was")
+    values[1] <- sum(is.na(dataset$Equality))
     
     
-    return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    plot_ly(type = "bar",
+            x = values,
+            y = options,
+            hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
+            marker = list(color = "#3F3685")
+    ) |>
+      #layout(xaxis = list(title = "", tickangle = -30)) |> 
+      config(displayModeBar = FALSE)
     
   })
+  
+  
+  
+  # output$equality_text <- renderText({
+  #   
+  #   options <- equality_options[-1]
+  #   
+  #   values <- map_int(options, 
+  #                     \(x) {str_detect((dataset$Equality |> replace_na("")), x) |> sum()})
+  #   
+  #   
+  #   max <- max(values)
+  #   
+  #   most_common <- options[values == max] |> str_flatten_comma(last = " and ")
+  #   
+  #   multiple <- length(options[values == max]) > 1
+  #   
+  #   plural <- if_else(multiple, "categories are", "category is")
+  #   
+  #   
+  #   return(paste0("The most common ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+  # })
+  
+  
+  
+  
+  
+  
   
   
   
