@@ -17,7 +17,7 @@ header <- dashboardHeader(
   title = dashboardtitle,
   titleWidth = 290,
   tags$li(class = "dropdown",
-          tags$p("Health & Wellbeing Metadata Catalogue Dashboard v1.0")
+          tags$p("Health & Wellbeing Metadata Catalogue v1.0")
   )
 )
 
@@ -102,7 +102,7 @@ home <- tabItem(
                       
                       box(width = 12,
                           solidHeader = TRUE,
-                          h1("Welcome to the Health & Wellbeing Catalogue Dashboard")
+                          h1("Welcome to the Health & Wellbeing Metadata Catalogue")
                       ), #box
                       
                       
@@ -115,43 +115,45 @@ home <- tabItem(
                           collapsible = TRUE, collapsed = TRUE,
                           title = p(strong("What is this dashboard?")),
                           
-                          p("This metadata catalogue provides metadata on easily accessible*,
-                            publicly available health and wellbeing indicators for Scotland.
-                            It provides information on what data is available, but the metadata 
-                            catalogue does not provide the actual data."),
+                          p("This catalogue provides metadata on easily accessible*, 
+                          publicly available health and wellbeing indicators for Scotland.
+                          It provides information on what data is available, but the 
+                          metadata catalogue does not provide the actual data."),
 		            
-                          p("It has been developed to make it easier to find and use existing
-                            intelligence for learning and decision making related to health and
-                            wellbeing."),
+                          p("It has been developed to make it easier to find and use 
+                            existing intelligence for learning and decision making related 
+                            to health and wellbeing."),
                           
-                          p("The catalogue includes data from Public Health Scotland (PHS), as well 
-                            as from other data owners such as the Office for National Statistics,
-                            National Records of Scotland, and Scottish Government."),
-                          
-                          p("Indicators from each publication are grouped by health and wellbeing 
-                            category, providing an overview of available metrics by topic. 
-                            Each indicator has a metadata profile that provides available detail 
-                            on that item, for example, frequency of data updates, categorical 
+                          p("The catalogue includes data from Public Health Scotland 
+                            (PHS), as well as from other data owners such as the Office 
+                            for National Statistics, National Records of Scotland, and 
+                            Scottish Government. "),
+                            
+                          p("Indicators from each publication are 
+                            grouped by health and wellbeing category, providing an
+                            overview of available metrics by topic. Each indicator has
+                            a metadata profile that provides available detail on that 
+                            item, for example, frequency of data updates, categorical 
                             breakdowns, and data source."),
                           
-                          p("The dashboard allows quick identification of relevant metrics 
-                            across wide range of topic areas and sources rather than searching
-                            multiple places."),
+                          p("The dashboard allows quick identification of relevant 
+                            metrics across wide range of topic areas and sources rather
+                            than searching multiple places."),
                           
                           h3("How did we decide what indicators to include?"),
                           
                           div(HTML("<ul>
                           <li><strong>*Easily accessible:</strong> it is accessible in a dashboard or report.
-                          Indicators that require data manipulation of the parent dataset 
-                          to extract the data have not been included. </li>
+                          Indicators that require data manipulation of the parent dataset to extract the data 
+                          have not been included. </li>
 
-                          <li><strong>Contemporary:</strong> only data that are routinely updated are included.
-                          Data that are no longer updated but are not older than 10 years old 
-                          are also included e.g. COVID-19 specific dashboards. </li>
+                          <li><strong>Contemporary:</strong> only data that is routinely updated is included. 
+                          Data that is no longer updated but is not older than 10 years old is also included 
+                          (e.g. COVID-19 wider impacts dashboard). </li>
 
                           <li><strong>Scotland:</strong> only datasets that include Scotland are included. </li>
 
-                          <li><strong>Population level:</strong> contains data representative of the population 
+                          <li><strong>Population level:</strong> contains data representative of the population
                           it relates to, i.e. small scale research studies are not included. </li>
                                    </ul>")),
                           
@@ -184,6 +186,15 @@ home <- tabItem(
                           
                           p("Controls in the sidebar allow you to filter and search the 
                             catalogue, for example by geography, equalities, or data source."),
+                          
+                          p("There is a button which looks like this:",
+                            img(src = "catalogue_buttons.png",
+                                alt = "screenshot of the buttons found in each row of the catalogue"),
+                            "Clicking on the blue part of the button will open a separate
+                            tab which will take you to the website where the dashboard, 
+                            indicator or publication is hosted. Clicking on the orange
+                            part of the button will pop-up a summary of all metadata
+                            related to that dashboard, indicator or publication."),
                           
                           p("There is a download button which looks like this:",
                             img(src = "download_button.png", 
@@ -549,7 +560,7 @@ ui <- tagList( #needed for shinyjs
   tags$head(HTML("<html lang='en'>"),
             tags$link(rel="shortcut icon",
                       href="favicon_phs.ico"), # Icon for browser tab
-            tags$title("Health & Wellbeing Catalogue Dashboard")
+            tags$title("Health & Wellbeing Metadata Catalogue")
   ),
   
   #pull together the elements created above

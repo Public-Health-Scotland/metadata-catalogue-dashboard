@@ -596,7 +596,8 @@ function(input, output, session){
   output$definitions_table <- renderTable({
     
     definitions |>
-      select(`Column name`, `Data type`, Definition, `Possible values`)
+      select(`Column name`, `Data type`, Definition, `Possible values`) |>
+      filter(!(`Column name` %in% c("Last updated", "Next updated")))
     
   }, striped = TRUE, bordered = TRUE, na = "", width = "100%")
   
@@ -699,24 +700,24 @@ function(input, output, session){
 
 
         fluidRow(
-          box(width = 3, solidHeader = TRUE,
+          box(width = 2, solidHeader = TRUE,
+              # strong("Next updated:"),
+              # p(dataset$`Next updated`[row])
+          ),
+          
+          box(width = 4, solidHeader = TRUE,
               strong("Frequency:"),
               p(dataset$Frequency[row])
           ),
 
-          box(width = 3, solidHeader = TRUE,
+          box(width = 4, solidHeader = TRUE,
               strong("Trends:"),
               p(dataset$Trends[row])
           ),
 
-          box(width = 3, solidHeader = TRUE,
-              strong("Last updated:"),
-              p(dataset$`Last updated`[row])
-          ),
-
-          box(width = 3, solidHeader = TRUE,
-              strong("Next updated:"),
-              p(dataset$`Next updated`[row])
+          box(width = 2, solidHeader = TRUE,
+              # strong("Last updated:"),
+              # p(dataset$`Last updated`[row])
           )
         ),
 
@@ -775,57 +776,59 @@ function(input, output, session){
   ## type ----
   output$type_chart <- renderPlotly({
     
-    types <- c("Indicator", "Dashboard", "Statistical report")
-    values <- map_int(types,
-                    \(x) {str_detect((dataset$Type |> replace_na("")), x) |> sum()})
-    
-    plot_ly(type = "pie",
-            labels = types,
-            values = values,
-            textposition = "inside",
-            textinfo = "label+percent",
-            showlegend = FALSE,
-            hovertemplate = "<b>%{label}</b><br>%{value} rows<extra></extra>",
-            marker = list(colors = c("#83BB26", "#9B4393", "#3F3685"))
-            ) |> 
-      config(displayModeBar = FALSE)
+    type_plot
+    # types <- c("Indicator", "Dashboard", "Statistical report")
+    # values <- map_int(types,
+    #                 \(x) {str_detect((dataset$Type |> replace_na("")), x) |> sum()})
+    # 
+    # plot_ly(type = "pie",
+    #         labels = types,
+    #         values = values,
+    #         textposition = "inside",
+    #         textinfo = "label+percent",
+    #         showlegend = FALSE,
+    #         hovertemplate = "<b>%{label}</b><br>%{value} rows<extra></extra>",
+    #         marker = list(colors = c("#83BB26", "#9B4393", "#3F3685"))
+    #         ) |> 
+    #   config(displayModeBar = FALSE)
   })
   
   
   output$int_ext_text <- renderText({
     
-    x <- dataset$`Produced by PHS` |> replace_na("") |> str_to_lower()
-    
-    yes <- sum(x == "yes")
-    no <- sum(x == "no")
-    
-    return(paste0("Of these, <b>", yes, "</b> are produced by PHS and <b>", no, "</b> are produced by other organisations."))
-    
+    int_ext_text
+    # x <- dataset$`Produced by PHS` |> replace_na("") |> str_to_lower()
+    # 
+    # yes <- sum(x == "yes")
+    # no <- sum(x == "no")
+    # 
+    # return(paste0("Of these, <b>", yes, "</b> are produced by PHS and <b>", no, "</b> are produced by other organisations."))
   })
   
   
   ##hw topic ----
   output$hw_topic_chart <- renderPlotly({
     
-    options <- hw_topic_options
-    options[1] <- "No topic"
-    options <- fct(options)
-    
-    
-    values <- map_int(hw_topic_options,
-                             \(x) {str_detect((dataset$`Health & wellbeing topic` |> replace_na("")), x) |> sum()})
-    
-    values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
-    
-  
-    plot_ly(type = "bar",
-            x = options,
-            y = values,
-            hovertemplate = "<b>%{x}</b><br>%{y} rows<extra></extra>",
-            marker = list(color = "#0078D4")
-            ) |>
-      layout(xaxis = list(title = "", tickangle = -30)) |> 
-      config(displayModeBar = FALSE)
+    hw_topic_plot
+    # options <- hw_topic_options
+    # options[1] <- "No topic"
+    # options <- fct(options)
+    # 
+    # 
+    # values <- map_int(hw_topic_options,
+    #                          \(x) {str_detect((dataset$`Health & wellbeing topic` |> replace_na("")), x) |> sum()})
+    # 
+    # values[1] <- sum(is.na(dataset$`Health & wellbeing topic`))
+    # 
+    # 
+    # plot_ly(type = "bar",
+    #         x = options,
+    #         y = values,
+    #         hovertemplate = "<b>%{x}</b><br>%{y} rows<extra></extra>",
+    #         marker = list(color = "#0078D4")
+    #         ) |>
+    #   layout(xaxis = list(title = "", tickangle = -30)) |> 
+    #   config(displayModeBar = FALSE)
     
   })
   
@@ -878,21 +881,22 @@ function(input, output, session){
   
   output$tags_text <- renderText({
     
-    options <- tag_options[-1]
-    
-    values <- map_int(options, 
-                      \(x) {str_detect((dataset$Tags |> replace_na("")), x) |> sum()})
-    
-    max <- max(values)
-    
-    most_common <- options[values == max] |> str_flatten_comma(last = " and ")
-    
-    multiple <- length(options[values == max]) > 1
-    
-    plural <- if_else(multiple, "tags are", "tag is")
-    
-    
-    return(paste0("The most frequent ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
+    tags_text
+    # options <- tag_options[-1]
+    # 
+    # values <- map_int(options, 
+    #                   \(x) {str_detect((dataset$Tags |> replace_na("")), x) |> sum()})
+    # 
+    # max <- max(values)
+    # 
+    # most_common <- options[values == max] |> str_flatten_comma(last = " and ")
+    # 
+    # multiple <- length(options[values == max]) > 1
+    # 
+    # plural <- if_else(multiple, "tags are", "tag is")
+    # 
+    # 
+    # return(paste0("The most frequent ", plural, " <b>", most_common, "</b> with <b>", max, "</b> entries."))
     
   })
   
@@ -901,18 +905,19 @@ function(input, output, session){
   ##geographies ----
   output$geographies_chart <- renderPlotly({
     
-    values <- map_int(geographies_options, 
-                      \(x) {str_detect((dataset$Geographies |> replace_na("")), x) |> sum()})
-    
-    
-    plot_ly(type = "bar",
-            x = values,
-            y = geographies_options |> reorder(length(geographies_options):1),
-            hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
-            marker = list(color = "#9B4393")
-    ) |>
-      #layout(xaxis = list(title = "", tickangle = -30)) |> 
-      config(displayModeBar = FALSE)
+    geographies_plot
+    # values <- map_int(geographies_options, 
+    #                   \(x) {str_detect((dataset$Geographies |> replace_na("")), x) |> sum()})
+    # 
+    # 
+    # plot_ly(type = "bar",
+    #         x = values,
+    #         y = geographies_options |> reorder(length(geographies_options):1),
+    #         hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
+    #         marker = list(color = "#9B4393")
+    # ) |>
+    #   #layout(xaxis = list(title = "", tickangle = -30)) |> 
+    #   config(displayModeBar = FALSE)
     
   })
   
@@ -940,24 +945,25 @@ function(input, output, session){
   ##equality ----
   output$equality_chart <- renderPlotly({
     
-    options <- equality_options
-    options[1] <- "None"
-    options <- reorder(options, length(options):1)
-    
-    values <- map_int(equality_options, 
-                      \(x) {str_detect((dataset$Equality |> replace_na("")), x) |> sum()})
-    
-    values[1] <- sum(is.na(dataset$Equality))
-    
-    
-    plot_ly(type = "bar",
-            x = values,
-            y = options,
-            hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
-            marker = list(color = "#3F3685")
-    ) |>
-      #layout(xaxis = list(title = "", tickangle = -30)) |> 
-      config(displayModeBar = FALSE)
+    equalities_plot
+    # options <- equality_options
+    # options[1] <- "None"
+    # options <- reorder(options, length(options):1)
+    # 
+    # values <- map_int(equality_options, 
+    #                   \(x) {str_detect((dataset$Equality |> replace_na("")), x) |> sum()})
+    # 
+    # values[1] <- sum(is.na(dataset$Equality))
+    # 
+    # 
+    # plot_ly(type = "bar",
+    #         x = values,
+    #         y = options,
+    #         hovertemplate = "<b>%{y}</b><br>%{x} rows<extra></extra>",
+    #         marker = list(color = "#3F3685")
+    # ) |>
+    #   #layout(xaxis = list(title = "", tickangle = -30)) |> 
+    #   config(displayModeBar = FALSE)
     
   })
   
